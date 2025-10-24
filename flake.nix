@@ -71,9 +71,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Private configuration (requires manual SSH/Git config - see README)
+    # Private configuration (requires manual SSH config - see README)
     private = {
-      url = "git+ssh://private-config";
+      url = "git+ssh://private-git/jmo/nixfiles.private";
     };
   };
 

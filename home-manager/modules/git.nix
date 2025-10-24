@@ -1,4 +1,4 @@
-{inputs, ...}: {
+{...}: {
   programs.git = {
     enable = true;
 
@@ -6,12 +6,5 @@
     ignores = [
       ".claude/settings.local.json"
     ];
-
-    # URL rewriting to abstract private flake location
-    extraConfig = {
-      url."ssh://private-git/jmo/nixfiles.private" = {
-        insteadOf = "ssh://private-config";
-      };
-    };
   };
 }

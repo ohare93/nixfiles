@@ -747,11 +747,11 @@
         "rev": "187eeb698bb5d702158d79c248809dd1bad3c796",
         "revCount": 5,
         "type": "git",
-        "url": "ssh://private-config"
+        "url": "ssh://private-git/jmo/nixfiles.private"
       },
       "original": {
         "type": "git",
-        "url": "ssh://private-config"
+        "url": "ssh://private-git/jmo/nixfiles.private"
       }
     },
     "root": {

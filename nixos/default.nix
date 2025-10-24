@@ -20,7 +20,7 @@
   # Configure nh with flake location
   programs.nh = {
     enable = true;
-    flake = "~/nixfiles";
+    flake = "/home/jmo/nixfiles";
   };
 
   environment.systemPackages = with pkgs; [

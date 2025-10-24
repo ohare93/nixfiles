@@ -127,7 +127,7 @@
 
           programs.nh = {
             enable = true;
-            flake = "~/nixfiles";
+            flake = "/home/jmo/nixfiles";
           };
 
           environment.systemPackages = with inputs.nixpkgs.legacyPackages.aarch64-linux; [
