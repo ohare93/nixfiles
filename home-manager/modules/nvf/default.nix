@@ -13,6 +13,7 @@
     ./ai.nix
     ./keymaps.nix
     ./neorg.nix
+    ./dotnet.nix
   ];
 
   # Basic vim options equivalent to kickstart's options.lua
