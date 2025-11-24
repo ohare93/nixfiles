@@ -1,0 +1,53 @@
+// zjstatus configuration for Zellij
+// Documentation: https://github.com/dj95/zjstatus/wiki
+
+layout {
+    default_tab_template {
+        children
+        pane size=1 borderless=true {
+            plugin location="file:~/.config/zellij/plugins/zjstatus.wasm" {
+                format_left  "{mode}#[bg=#181825] {tabs}"
+                format_center "{notifications}"
+                format_right "{command_alert}#[bg=#181825] {datetime}"
+                format_space "#[bg=#181825]"
+
+                // Modes
+                mode_normal        "#[bg=#89B4FA,fg=#181825,bold] NORMAL#[bg=#181825,fg=#89B4FA]"
+                mode_locked        "#[bg=#89B4FA,fg=#181825,bold] LOCKED#[bg=#181825,fg=#89B4FA]"
+                mode_resize        "#[bg=#89B4FA,fg=#181825,bold] RESIZE#[bg=#181825,fg=#89B4FA]"
+                mode_pane          "#[bg=#89B4FA,fg=#181825,bold] PANE#[bg=#181825,fg=#89B4FA]"
+                mode_tab           "#[bg=#89B4FA,fg=#181825,bold] TAB#[bg=#181825,fg=#89B4FA]"
+                mode_scroll        "#[bg=#89B4FA,fg=#181825,bold] SCROLL#[bg=#181825,fg=#89B4FA]"
+                mode_enter_search  "#[bg=#89B4FA,fg=#181825,bold] SEARCH#[bg=#181825,fg=#89B4FA]"
+                mode_search        "#[bg=#89B4FA,fg=#181825,bold] SEARCH#[bg=#181825,fg=#89B4FA]"
+                mode_rename_tab    "#[bg=#89B4FA,fg=#181825,bold] RENAME TAB#[bg=#181825,fg=#89B4FA]"
+                mode_rename_pane   "#[bg=#89B4FA,fg=#181825,bold] RENAME PANE#[bg=#181825,fg=#89B4FA]"
+                mode_session       "#[bg=#89B4FA,fg=#181825,bold] SESSION#[bg=#181825,fg=#89B4FA]"
+                mode_move          "#[bg=#89B4FA,fg=#181825,bold] MOVE#[bg=#181825,fg=#89B4FA]"
+                mode_prompt        "#[bg=#89B4FA,fg=#181825,bold] PROMPT#[bg=#181825,fg=#89B4FA]"
+                mode_tmux          "#[bg=#89B4FA,fg=#181825,bold] TMUX#[bg=#181825,fg=#89B4FA]"
+
+                // Tabs
+                tab_normal   "#[fg=#6C7086,bg=#181825] {index}:{name} "
+                tab_active   "#[fg=#9399B2,bg=#181825,bold] {index}:{name}{floating_indicator} "
+                tab_separator "#[fg=#6C7086,bg=#181825] | "
+
+                // Notifications widget - receives messages from `zellij pipe "zjstatus::notify::message"`
+                notification_format_unread "#[fg=#F38BA8,bg=#181825,bold,blink]  {message} "
+                notification_format_no_notifications ""
+                notification_show_interval "10"
+
+                // Command widget - periodically runs a script to check for alerts
+                command_alert_command  "~/.config/zellij/check-alerts.sh"
+                command_alert_format   "{stdout}"
+                command_alert_interval "5"
+                command_alert_rendermode "static"
+
+                // Datetime
+                datetime        "#[fg=#9399B2,bg=#181825] {format} "
+                datetime_format "%Y-%m-%d %H:%M"
+                datetime_timezone "Europe/London"
+            }
+        }
+    }
+}

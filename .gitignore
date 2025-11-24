@@ -1,0 +1,6 @@
+# Nix build output symlinks
+result
+result-*
+
+# Private configuration (encrypted version is secrets/private.nix.age)
+private.nix
