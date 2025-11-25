@@ -18,9 +18,14 @@ in
       wayland.windowManager.hyprland = {
         enable = true;
 
-        # Enable systemd integration with all environment variables
-        # This is required for hypridle service to access PATH
-        systemd.variables = ["--all"];
+        systemd.variables = [
+          "PATH"
+          "WAYLAND_DISPLAY"
+          "DISPLAY"
+          "XDG_CURRENT_DESKTOP"
+          "XDG_SESSION_TYPE"
+          "HYPRLAND_INSTANCE_SIGNATURE"
+        ];
 
         settings = {
           # Monitor configuration - explicit setup for DisplayLink ultrawide

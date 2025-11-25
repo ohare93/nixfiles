@@ -18,7 +18,6 @@
     bat
     bat-extras.batman # Man pages with bat
     eza
-    yazi # Terminal file manager
     jq
     dnsutils
     nixd

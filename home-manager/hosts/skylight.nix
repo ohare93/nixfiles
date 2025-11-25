@@ -46,6 +46,7 @@
     # Other essential tools
     ssh.enable = true;
     television.enable = true;
+    yazi.enable = true;
 
     # Disable GUI and unnecessary features
     gui-software.enable = false;

@@ -53,5 +53,6 @@
     ssh.enable = true;
     notes.zk.enable = true;
     television.enable = true;
+    yazi.enable = true;
   };
 }

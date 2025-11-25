@@ -40,6 +40,7 @@
     ssh.enable = true;
     notes.zk.enable = true;
     television.enable = true;
+    yazi.enable = true;
 
     # Disable GUI-only features for WSL
     gui-software.enable = false;

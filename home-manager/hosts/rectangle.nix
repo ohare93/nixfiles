@@ -55,6 +55,7 @@
     ssh.enable = true;
     notes.zk.enable = true;
     television.enable = true;
+    yazi.enable = true;
   };
 
   # Disable formatters and AI plugins in nvim for aarch64

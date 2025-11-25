@@ -25,6 +25,7 @@ in {
     ./immich.nix
     ./waybar-updates.nix
     ./television.nix
+    ./yazi.nix
     ./nushell.nix
     ./starship.nix
     ./neomutt.nix
