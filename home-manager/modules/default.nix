@@ -29,10 +29,11 @@ in {
     ./nushell.nix
     ./starship.nix
     ./neomutt.nix
+    ./stmp.nix
     inputs.immich-auto-uploader.nixosModules.home-manager
   ];
 
-  # Add beads to home packages
+  # Add custom packages
   config.home.packages = [
     customPackages.beads
   ];

@@ -47,5 +47,6 @@
     notes.zk.enable = true;
     television.enable = true;
     yazi.enable = true;
+    stmp.enable = true;
   };
 }
