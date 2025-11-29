@@ -30,6 +30,7 @@ in {
     ./starship.nix
     ./neomutt.nix
     ./stmp.nix
+    ./bitwarden.nix
     inputs.immich-auto-uploader.nixosModules.home-manager
   ];
 
