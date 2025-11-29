@@ -165,6 +165,9 @@ in
             # Application launcher - Super+D
             "$mod, D, exec, rofi -show drun"
 
+            # Bitwarden password picker - Super+Shift+P
+            "$mod SHIFT, P, exec, rofi-bw"
+
             # Window management - core Omarchy-inspired bindings
             "$mod, W, killactive," # Close window
             "$mod, V, togglefloating," # Toggle floating
