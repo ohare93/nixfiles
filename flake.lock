@@ -47,11 +47,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1764037850,
-        "narHash": "sha256-D+wiLDWlZJCcE/Nu3JDkkQCV/0UDuIwtSjffaqkUMEg=",
+        "lastModified": 1764201807,
+        "narHash": "sha256-W3zh+f2Scuvk2iRlAbWlvZw1CEYplmhBrtBQ/+Y55zU=",
         "owner": "sadjow",
         "repo": "claude-code-nix",
-        "rev": "ed2fdc7b4be393cbd16edc6e35e19dcce91ac380",
+        "rev": "de113a7058f300d6154acbfe2e27f5be9312a412",
         "type": "github"
       },
       "original": {
@@ -741,11 +741,11 @@
     },
     "private": {
       "locked": {
-        "lastModified": 1764077995,
-        "narHash": "sha256-nqQoVXos8nCnPTVqtlFD8mSggopk9n3osgTljQPuAok=",
+        "lastModified": 1764403908,
+        "narHash": "sha256-z4RiwqXQH8YAVdyQTzl47YKCCz1tuAAf/fiYbCSPTyM=",
         "ref": "refs/heads/main",
-        "rev": "89ee608def04a1e171fa1aedd9d044d91a4f4b62",
-        "revCount": 7,
+        "rev": "819c4901b63cc437f64bded80f2f6b16380c1ec1",
+        "revCount": 8,
         "type": "git",
         "url": "ssh://private-git/jmo/nixfiles.private"
       },

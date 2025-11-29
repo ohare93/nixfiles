@@ -54,6 +54,13 @@ in
             hostname = "github.com";
             identityFile = inputs.private.ssh.identityFiles.githubDc;
           };
+          "cloud" = {
+            hostname = inputs.private.services.cloud.domain;
+            inherit (inputs.private.services.cloud) port;
+            inherit (inputs.private.services.cloud) user;
+            identityFile = [inputs.private.ssh.identityFiles.cloud];
+            identitiesOnly = true;
+          };
         };
       };
 
