@@ -1245,11 +1245,11 @@
     },
     "private": {
       "locked": {
-        "lastModified": 1764403908,
-        "narHash": "sha256-z4RiwqXQH8YAVdyQTzl47YKCCz1tuAAf/fiYbCSPTyM=",
+        "lastModified": 1765738197,
+        "narHash": "sha256-GJE9EgxvhvoiSIVdfyXX19x84bTEKgCVfdXbood+bhA=",
         "ref": "refs/heads/main",
-        "rev": "819c4901b63cc437f64bded80f2f6b16380c1ec1",
-        "revCount": 8,
+        "rev": "a15928e9e0b250405f1c684368de0823defaf76a",
+        "revCount": 9,
         "type": "git",
         "url": "ssh://private-git/jmo/nixfiles.private"
       },
