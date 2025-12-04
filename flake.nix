@@ -71,6 +71,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    jj = {
+      url = "github:jj-vcs/jj";
+    };
+
     # Private configuration (requires manual SSH config - see README)
     private = {
       url = "git+ssh://private-git/jmo/nixfiles.private";

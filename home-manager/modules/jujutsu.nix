@@ -28,7 +28,7 @@
         "format_short_signature(signature)" = "signature.email().local()";
       };
       revset-aliases = {
-        "immutable_heads()" = ''trunk() | (trunk().. & ~mine() & ~author("noreply@anthropic.com")) | untracked_remote_bookmarks() | (tags() & ~tags(regex:".*-feature.*"))'';
+        "immutable_heads()" = ''trunk() | (trunk().. & ~mine() & ~author(substring:"noreply@anthropic.com")) | untracked_remote_bookmarks() | (tags() & ~tags(regex:".*-feature.*"))'';
       };
     };
   };
