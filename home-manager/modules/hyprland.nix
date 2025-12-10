@@ -263,6 +263,10 @@ in
 
             # Display toggle - Super+Shift+Escape to switch between laptop/external monitor modes
             "$mod SHIFT, Escape, exec, ~/.config/hypr/toggle-display.sh"
+
+            # Input device toggles - for keyboard-focused workflow
+            "$mod, T, exec, ~/.local/bin/toggle-touchpad" # Toggle touchpad only (Super+T)
+            "$mod SHIFT, T, exec, ~/.local/bin/toggle-pointer" # Toggle ALL pointer devices (Super+Shift+T)
           ];
 
           # Mouse bindings for window manipulation
@@ -411,6 +415,76 @@ in
             # Laptop is enabled, disable it
             hyprctl keyword monitor "eDP-1,disable"
             notify-send "Laptop Screen" "Disabled"
+          fi
+        '';
+        executable = true;
+      };
+
+      # Toggle touchpad/trackpad on/off
+      home.file.".local/bin/toggle-touchpad" = {
+        text = ''
+          #!/usr/bin/env bash
+          # Toggle touchpad enabled/disabled in Hyprland
+          # Uses hyprctl to find and toggle the touchpad device
+
+          # Find the touchpad device name (usually contains "touchpad" or "Touchpad")
+          TOUCHPAD=$(hyprctl devices -j | ${pkgs.jq}/bin/jq -r '.mice[] | select(.name | test("touchpad|Touchpad"; "i")) | .name' | head -n1)
+
+          if [[ -z "$TOUCHPAD" ]]; then
+            notify-send "Toggle Touchpad" "No touchpad device found"
+            exit 1
+          fi
+
+          # Check current state by looking at the device in hyprctl devices output
+          # We need to track state ourselves since hyprctl doesn't expose enabled status directly
+          STATE_FILE="/tmp/touchpad-state"
+
+          if [[ -f "$STATE_FILE" && $(cat "$STATE_FILE") == "disabled" ]]; then
+            # Currently disabled, enable it
+            hyprctl keyword "device[$TOUCHPAD]:enabled" true
+            echo "enabled" > "$STATE_FILE"
+            notify-send "Touchpad" "Enabled"
+          else
+            # Currently enabled (or unknown), disable it
+            hyprctl keyword "device[$TOUCHPAD]:enabled" false
+            echo "disabled" > "$STATE_FILE"
+            notify-send "Touchpad" "Disabled"
+          fi
+        '';
+        executable = true;
+      };
+
+      # Toggle all pointer devices (mouse + touchpad) on/off
+      home.file.".local/bin/toggle-pointer" = {
+        text = ''
+          #!/usr/bin/env bash
+          # Toggle ALL pointer devices (mice, touchpads) enabled/disabled in Hyprland
+          # Useful when you want to force keyboard-only usage
+
+          STATE_FILE="/tmp/pointer-state"
+
+          # Get all pointer device names
+          DEVICES=$(hyprctl devices -j | ${pkgs.jq}/bin/jq -r '.mice[].name')
+
+          if [[ -z "$DEVICES" ]]; then
+            notify-send "Toggle Pointer" "No pointer devices found"
+            exit 1
+          fi
+
+          if [[ -f "$STATE_FILE" && $(cat "$STATE_FILE") == "disabled" ]]; then
+            # Currently disabled, enable all
+            while IFS= read -r device; do
+              hyprctl keyword "device[$device]:enabled" true
+            done <<< "$DEVICES"
+            echo "enabled" > "$STATE_FILE"
+            notify-send "Pointer Devices" "All enabled"
+          else
+            # Currently enabled, disable all
+            while IFS= read -r device; do
+              hyprctl keyword "device[$device]:enabled" false
+            done <<< "$DEVICES"
+            echo "disabled" > "$STATE_FILE"
+            notify-send "Pointer Devices" "All disabled (keyboard only mode)"
           fi
         '';
         executable = true;
