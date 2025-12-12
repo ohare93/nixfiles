@@ -2,6 +2,7 @@
   lib,
   config,
   pkgs,
+  inputs,
   ...
 }: let
   cfg = config.mynix.hyprland;
@@ -17,6 +18,13 @@ in
       # Enable Hyprland
       wayland.windowManager.hyprland = {
         enable = true;
+
+        # Use Hyprland from flake for consistency with hy3 plugin
+        package = inputs.hyprland.packages.${pkgs.system}.hyprland;
+
+        plugins = [
+          inputs.hy3.packages.${pkgs.system}.hy3
+        ];
 
         systemd.variables = [
           "PATH"
@@ -69,8 +77,22 @@ in
             "col.active_border" = "rgba(33ccffee) rgba(00ff99ee) 45deg";
             "col.inactive_border" = "rgba(595959aa)";
 
-            layout = "dwindle";
+            layout = "hy3";
             allow_tearing = false;
+          };
+
+          # hy3 plugin settings for i3-style equal window splits
+          # trigger_width=-1 = never vertical splits (no stacking top-bottom)
+          # trigger_height=0 = always horizontal splits (windows side-by-side)
+          # Result: 3 windows = 33/33/33 horizontal layout
+          plugin = {
+            hy3 = {
+              autotile = {
+                enable = true;
+                trigger_width = "-1";
+                trigger_height = 0;
+              };
+            };
           };
 
           # Decoration
@@ -108,12 +130,6 @@ in
             ];
           };
 
-          # Layout configuration
-          dwindle = {
-            pseudotile = true;
-            preserve_split = true;
-          };
-
           # Misc settings
           misc = {
             force_default_wallpaper = 0;
@@ -130,24 +146,25 @@ in
           ];
 
           # Window rules for better application handling
+          # Hyprland 0.52+ syntax: "effect value, match:prop pattern"
           windowrule = [
-            "float, class:^pavucontrol$"
-            "float, class:^blueman-manager$"
-            "float, class:^nm-connection-editor$"
-            "float, class:^file_progress$"
-            "float, class:^confirm$"
-            "float, class:^dialog$"
-            "float, class:^download$"
-            "float, class:^notification$"
-            "float, class:^error$"
-            "float, class:^splash$"
-            "float, class:^confirmreset$"
-            "float, title:^(Open File)(.*)$"
-            "float, title:^(Select a File)(.*)$"
-            "float, title:^(Choose wallpaper)(.*)$"
-            "float, title:^(Open Folder)(.*)$"
-            "float, title:^(Save As)(.*)$"
-            "float, title:^(Library)(.*)$"
+            "float on, match:class ^pavucontrol$"
+            "float on, match:class ^blueman-manager$"
+            "float on, match:class ^nm-connection-editor$"
+            "float on, match:class ^file_progress$"
+            "float on, match:class ^confirm$"
+            "float on, match:class ^dialog$"
+            "float on, match:class ^download$"
+            "float on, match:class ^notification$"
+            "float on, match:class ^error$"
+            "float on, match:class ^splash$"
+            "float on, match:class ^confirmreset$"
+            "float on, match:title ^(Open File)(.*)$"
+            "float on, match:title ^(Select a File)(.*)$"
+            "float on, match:title ^(Choose wallpaper)(.*)$"
+            "float on, match:title ^(Open Folder)(.*)$"
+            "float on, match:title ^(Save As)(.*)$"
+            "float on, match:title ^(Library)(.*)$"
           ];
 
           # OMARCHY-INSPIRED KEYBOARD BINDINGS
@@ -165,24 +182,31 @@ in
             # Application launcher - Super+D
             "$mod, D, exec, rofi -show drun"
 
-            # Window management - core Omarchy-inspired bindings
+            # Window management - core bindings
             "$mod, W, killactive," # Close window
             "$mod, V, togglefloating," # Toggle floating
             "$mod, P, pseudo," # Pseudo tiling
-            "$mod, J, togglesplit," # Toggle split
             "$mod, F, fullscreen," # Toggle fullscreen
 
-            # Focus movement - Super + Arrow keys (with cursor auto-center)
-            "$mod, left, movefocus, l"
-            "$mod, right, movefocus, r"
-            "$mod, up, movefocus, u"
-            "$mod, down, movefocus, d"
+            # hy3 group management (for equal window splits)
+            # Press SUPER+G before opening windows to create horizontal group
+            # All windows opened after will split equally (33%/33%/33% for 3 windows)
+            "$mod, G, hy3:makegroup, h"              # Create horizontal group
+            "$mod SHIFT, G, hy3:makegroup, v"        # Create vertical group
+            "$mod, T, hy3:makegroup, tab"            # Create tabbed group
+            "$mod, E, hy3:changegroup, opposite"     # Toggle h↔v orientation
+            "$mod, U, hy3:changefocus, raise"        # Focus parent container
+            "$mod SHIFT, U, hy3:changefocus, lower"  # Focus child container
 
-            # Focus movement - Vim-style (hjkl)
-            "$mod, H, movefocus, l"
-            "$mod, L, movefocus, r"
-            "$mod, K, movefocus, u"
-            "$mod, J, movefocus, d"
+            # Focus movement - hy3 versions (work properly with groups)
+            "$mod, left, hy3:movefocus, l"
+            "$mod, right, hy3:movefocus, r"
+            "$mod, up, hy3:movefocus, u"
+            "$mod, down, hy3:movefocus, d"
+            "$mod, H, hy3:movefocus, l"
+            "$mod, L, hy3:movefocus, r"
+            "$mod, K, hy3:movefocus, u"
+            "$mod, J, hy3:movefocus, d"
 
             # Workspace navigation - Super + numbers
             "$mod, 1, workspace, 1"
@@ -218,11 +242,11 @@ in
             "$mod CTRL, K, resizeactive, 0 -20"
             "$mod CTRL, J, resizeactive, 0 20"
 
-            # Window moving
-            "$mod SHIFT, H, movewindow, l"
-            "$mod SHIFT, L, movewindow, r"
-            "$mod SHIFT, K, movewindow, u"
-            "$mod SHIFT, J, movewindow, d"
+            # Window moving - hy3 versions (work properly with groups)
+            "$mod SHIFT, H, hy3:movewindow, l"
+            "$mod SHIFT, L, hy3:movewindow, r"
+            "$mod SHIFT, K, hy3:movewindow, u"
+            "$mod SHIFT, J, hy3:movewindow, d"
 
             # Special workspace (scratchpad)
             "$mod, S, togglespecialworkspace, magic"
@@ -231,7 +255,7 @@ in
             # System controls
             "$mod SHIFT, Q, exit," # Exit Hyprland (with Shift for safety)
             "$mod SHIFT, R, exec, hyprctl reload" # Reload config
-            "$mod, L, exec, hyprlock" # Lock screen
+            "$mod CTRL, L, exec, hyprlock" # Lock screen (CTRL to avoid vim conflict with movefocus)
 
             # Help system - using the minus key (easily accessible)
             "$mod, minus, exec, ~/.config/hypr/keybinds-help.sh" # Show keybindings help (Super+-)
@@ -472,8 +496,11 @@ in
             modules-right = ["tray" "custom/nixos-updates" "disk" "pulseaudio" "battery" "clock"];
 
             "hyprland/workspaces" = {
+              format = "{name}";
+              on-click = "activate";
               disable-scroll = true;
               all-outputs = true;
+              sort-by = "number";
             };
 
             "hyprland/mode" = {

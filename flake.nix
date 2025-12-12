@@ -75,6 +75,17 @@
       url = "github:jj-vcs/jj";
     };
 
+    hyprland = {
+      url = "github:hyprwm/Hyprland";
+    };
+
+    # Using PR #261 branch for Hyprland 0.52.x compatibility (headers fix)
+    # Once merged, switch back to: url = "github:outfoxxed/hy3";
+    hy3 = {
+      url = "github:Immelancholy/hy3/update-to-m_reserved_area";
+      inputs.hyprland.follows = "hyprland";
+    };
+
     # Private configuration (requires manual SSH config - see README)
     private = {
       url = "git+ssh://private-git/jmo/nixfiles.private";
