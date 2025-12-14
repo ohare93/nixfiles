@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Skip nh's internal password prompt - use sudo explicitly when needed
+export NH_ELEVATION_PROGRAM=true
+
 docker-shell() {
 	# easily "docker exec" into a running Docker container
 	# latest version: https://gist.github.com/ljm42/2b3bfd8ff886015bbce8
