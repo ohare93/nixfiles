@@ -56,15 +56,15 @@
         users = ["jmo"];
         commands = [
           {
-            command = "/run/current-system/sw/bin/nixos-rebuild";
+            command = "/run/current-system/sw/bin/nixos-rebuild *";
             options = ["NOPASSWD"];
           }
           {
-            command = "/run/current-system/sw/bin/nix-collect-garbage";
+            command = "/run/current-system/sw/bin/nix-collect-garbage *";
             options = ["NOPASSWD"];
           }
           {
-            command = "/run/current-system/sw/bin/systemctl";
+            command = "/run/current-system/sw/bin/systemctl *";
             options = ["NOPASSWD"];
           }
         ];
