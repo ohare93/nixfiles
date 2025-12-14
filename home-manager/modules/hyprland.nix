@@ -255,7 +255,7 @@ in
             # System controls
             "$mod SHIFT, Q, exit," # Exit Hyprland (with Shift for safety)
             "$mod SHIFT, R, exec, hyprctl reload" # Reload config
-            "$mod CTRL, L, exec, hyprlock" # Lock screen (CTRL to avoid vim conflict with movefocus)
+            "$mod, Escape, exec, hyprlock" # Lock screen
 
             # Help system - using the minus key (easily accessible)
             "$mod, minus, exec, ~/.config/hypr/keybinds-help.sh" # Show keybindings help (Super+-)
