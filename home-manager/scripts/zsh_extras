@@ -36,3 +36,12 @@ docker-shell() {
 	fi
 	done
 }
+
+bwcp() {
+	# Copy password to clipboard and print username
+	# Usage: bwcp <searchterm>
+	local item
+	item=$(bw get item "$1")
+	echo "$item" | jq -r '.login.password' | wl-copy
+	echo "$item" | jq -r '.login.username'
+}
