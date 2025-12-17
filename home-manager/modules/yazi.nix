@@ -82,7 +82,7 @@ in
         [filechooser]
         cmd=yazi-wrapper.sh
         default_dir=''$HOME
-        env=TERMCMD=foot
+        env=TERMCMD=kitty
       '';
 
       # XDG portal preference - use termfilechooser for file dialogs

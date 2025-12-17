@@ -18,6 +18,7 @@
     zsh.enable = true;
     starship.enable = true;
     nushell.enable = true;
+    kitty.enable = true;
 
     # Development tools
     devbox = {

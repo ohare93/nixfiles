@@ -174,7 +174,7 @@ in
           # Application launchers - quick access to essential tools
           bind = [
             # Terminal - Super+Return (most important shortcut)
-            "$mod, Return, exec, foot"
+            "$mod, Return, exec, kitty"
 
             # Browser - Super+B
             "$mod, B, exec, qutebrowser"
@@ -259,7 +259,7 @@ in
 
             # Help system - using the minus key (easily accessible)
             "$mod, minus, exec, ~/.config/hypr/keybinds-help.sh" # Show keybindings help (Super+-)
-            "$mod SHIFT, slash, exec, foot -e hyprctl binds" # Show all binds in terminal
+            "$mod SHIFT, slash, exec, kitty -e hyprctl binds" # Show all binds in terminal
 
             # Screenshot with Hyprshot (Wayland-native)
             # All modes save to /tmp/screenshots and copy to clipboard for pasting
@@ -456,8 +456,8 @@ in
         hyprlock # Hyprland's GPU-accelerated screen locker
         hypridle # Hyprland's idle daemon
 
-        # Terminal - Wayland-native options
-        foot # Lightweight Wayland terminal (primary)
+        # Terminal - Wayland-native options (kitty managed by kitty.nix module)
+        foot # Lightweight Wayland terminal (backup)
         alacritty # Alternative Wayland terminal (backup)
 
         # Notification daemon
