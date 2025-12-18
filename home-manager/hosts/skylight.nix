@@ -1,6 +1,7 @@
-# Home-manager configuration for skylight
-# Headless build/test VM with minimal configuration
 {
+  lib,
+  pkgs,
+  inputs,
   ...
 }: {
   imports = [
@@ -8,50 +9,55 @@
     ../common/packages.nix
   ];
 
-  # Packages inherited from common/packages.nix
-  # Additional host-specific packages can be added via home.packages if needed
+  home.packages = [
+    inputs.nixpkgs.legacyPackages.${pkgs.system}.jujutsu
+  ];
 
-  # Minimal mynix configuration for headless VM
+  programs.jujutsu.enable = lib.mkForce false;
+
   mynix = {
-    # Shell and terminal
     zsh.enable = true;
     starship.enable = true;
-    nushell.enable = true;
+    nushell.enable = false;
 
-    # Essential terminal utilities
     terminal-misc = {
       zoxide.enable = true;
       zellij.enable = true;
       atuin.enable = true;
-      fzf.enable = true;
-      carapace.enable = true;
-      claude.enable = true;
-      devbox.enable = true;
-      comma.enable = true;
-      nvd.enable = true;
-
-      # Disable heavy/unnecessary tools
+      fzf.enable = false;
+      carapace.enable = false;
+      claude.enable = false;
+      devbox.enable = false;
+      comma.enable = false;
+      nvd.enable = false;
       gren.enable = false;
       poetry.enable = false;
       opencode.enable = false;
     };
 
-    # Development tools
-    devbox = {
-      enable = true;
-      enhancedShell = true;
-      direnv = true;
-    };
-
-    # Other essential tools
+    devbox.enable = false;
+    television.enable = false;
+    yazi.enable = false;
     ssh.enable = true;
-    television.enable = true;
-    yazi.enable = true;
-
-    # Disable GUI and unnecessary features
     gui-software.enable = false;
     hyprland.enable = false;
     syncthing.enable = false;
     notes.zk.enable = false;
+    qutebrowser.enable = false;
+  };
+
+  programs.nvf.enable = lib.mkForce false;
+
+  programs.neovim = {
+    enable = true;
+    defaultEditor = true;
+    viAlias = true;
+    vimAlias = true;
+    extraConfig = ''
+      set number
+      set expandtab
+      set tabstop=2
+      set shiftwidth=2
+    '';
   };
 }

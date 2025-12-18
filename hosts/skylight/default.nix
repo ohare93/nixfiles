@@ -19,6 +19,12 @@
   # Enable ARM emulation for building RPi5 images
   boot.binfmt.emulatedSystems = ["aarch64-linux"];
 
+  # Add swap for memory-intensive builds (qtwebengine under QEMU needs >10GB)
+  swapDevices = [{
+    device = "/swapfile";
+    size = 16 * 1024; # 16GB
+  }];
+
   # VirtIO kernel modules required for VM disk access in initramfs
   boot.initrd.availableKernelModules = [
     "virtio_blk"

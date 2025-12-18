@@ -195,23 +195,6 @@
     # Disable Gren (broken Haskell dependencies on aarch64)
     mynix.terminal-misc.gren.enable = lib.mkForce false;
 
-    programs.nvf.settings.vim = {
-      # Disable formatters
-      languages = {
-        markdown.format.enable = lib.mkForce false;
-        css.format.enable = lib.mkForce false;
-        ts.format.enable = lib.mkForce false;
-      };
-
-      # Disable AI assistant plugins
-      assistant.codecompanion-nvim.enable = lib.mkForce false;
-
-      # Disable Gren treesitter grammar (has broken Haskell dependencies on aarch64)
-      treesitter.grammars = lib.mkForce [
-        pkgs.tree-sitter-grammars.tree-sitter-norg
-        pkgs.tree-sitter-grammars.tree-sitter-norg-meta
-      ];
-    };
   };
 
   # System state version

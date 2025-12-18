@@ -1,77 +1,90 @@
-# Home-manager configuration for rectangle
-# Raspberry Pi 5 streaming client with minimal i3 setup
 {
   lib,
   pkgs,
+  inputs,
   ...
 }: {
   imports = [
     ../common/base.nix
-    ../common/packages.nix
   ];
 
-  # Packages inherited from common/packages.nix
-  # Additional host-specific packages can be added via home.packages if needed
+  home.packages = with pkgs; [
+    htop
+    btop
+    tree
+    jq
+    dnsutils
+    lsof
+    procps
+    psmisc
+    usbutils
+    pciutils
+    gum
+    ripgrep
+    fd
+    bat
+    iotop
+    ncdu
+    xclip
+    wl-clipboard
+    inputs.nixpkgs.legacyPackages.${pkgs.system}.jujutsu
+  ];
 
-  # Explicitly enable mynix modules for this host
+  programs.jujutsu.enable = lib.mkForce false;
+
   mynix = {
-    # i3 window manager (not Hyprland)
     i3.enable = true;
-
-    # Shell and terminal
+    kitty.enable = true;
     zsh.enable = true;
-    starship.enable = true;
-    nushell.enable = true;
+    starship.enable = false;
+    nushell.enable = false;
 
-    # Terminal utilities (minimal set)
     terminal-misc = {
       zoxide.enable = true;
-      zellij.enable = true;
       atuin.enable = true;
-      fzf.enable = true;
-      carapace.enable = true;
       claude.enable = true;
-      devbox.enable = true;
-      comma.enable = true;
-      nvd.enable = true;
-
-      # Explicitly disable broken packages on aarch64
+      zellij.enable = false;
+      fzf.enable = false;
+      carapace.enable = false;
+      devbox.enable = false;
+      comma.enable = false;
+      nvd.enable = false;
       gren.enable = lib.mkForce false;
       poetry.enable = false;
       opencode.enable = false;
     };
 
-    # Development (limited)
-    devbox = {
-      enable = true;
-      enhancedShell = true;
-      direnv = true;
-    };
-
-    # Disable Elm (broken on aarch64)
+    devbox.enable = false;
+    notes.zk.enable = false;
+    television.enable = false;
+    yazi.enable = false;
     elm.enable = lib.mkForce false;
-
-    # Other tools
     ssh.enable = true;
-    notes.zk.enable = true;
-    television.enable = true;
-    yazi.enable = true;
+    qutebrowser.enable = false;
   };
 
-  # Disable formatters and AI plugins in nvim for aarch64
-  programs.nvf.settings.vim = {
-    languages = {
-      markdown.format.enable = lib.mkForce false;
-      css.format.enable = lib.mkForce false;
-      ts.format.enable = lib.mkForce false;
-    };
+  programs.nvf.enable = lib.mkForce false;
 
-    assistant.codecompanion-nvim.enable = lib.mkForce false;
+  programs.neovim = {
+    enable = true;
+    defaultEditor = true;
+    viAlias = true;
+    vimAlias = true;
+    extraConfig = ''
+      set number
+      set relativenumber
+      set expandtab
+      set tabstop=2
+      set shiftwidth=2
+      set smartindent
+      set ignorecase
+      set smartcase
+      set clipboard=unnamedplus
+    '';
+  };
 
-    # Disable Gren treesitter grammar (has broken Haskell dependencies on aarch64)
-    treesitter.grammars = lib.mkForce [
-      pkgs.tree-sitter-grammars.tree-sitter-norg
-      pkgs.tree-sitter-grammars.tree-sitter-norg-meta
-    ];
+  home.sessionVariables = {
+    EDITOR = "nvim";
+    VISUAL = "nvim";
   };
 }
