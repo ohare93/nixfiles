@@ -10,6 +10,7 @@
     # Raspberry Pi 5 hardware modules
     inputs.nixos-raspberrypi.nixosModules.raspberry-pi-5.base
     inputs.nixos-raspberrypi.nixosModules.raspberry-pi-5.page-size-16k
+    inputs.nixos-raspberrypi.nixosModules.raspberry-pi-5.display-vc4
     # SD image builder from nixos-raspberrypi (compatible with RPi bootloader)
     inputs.nixos-raspberrypi.nixosModules.sd-image
   ];
@@ -41,8 +42,18 @@
       variant = "";
     };
 
-    # Use fbdev driver for Raspberry Pi 5 framebuffer
-    videoDrivers = ["fbdev"];
+    # Use modesetting driver for VC4 GPU acceleration
+    videoDrivers = ["modesetting"];
+
+    # Disable screen blanking and DPMS (Display Power Management Signaling)
+    # Prevents screen from going to sleep during media playback
+    serverFlagsSection = ''
+      Option "BlankTime" "0"
+      Option "StandbyTime" "0"
+      Option "SuspendTime" "0"
+      Option "OffTime" "0"
+      Option "DPMS" "false"
+    '';
 
     windowManager.i3.enable = true;
     displayManager.lightdm.enable = true;
@@ -97,8 +108,23 @@
     # Movie/media streaming client
     jellyfin-media-player
 
-    # Web browser
-    chromium
+    # Web browser with GPU acceleration for Raspberry Pi 5
+    # Note: ARM doesn't support VAAPI - Pi 5 uses V4L2 (not included in standard Chromium)
+    (chromium.override {
+      commandLineArgs = [
+        # GPU rendering acceleration (works with modesetting driver)
+        "--enable-features=CanvasOopRasterization"
+        "--enable-gpu-rasterization"
+        "--enable-zero-copy"
+        "--use-gl=egl"
+
+        # Ignore GPU blocklist (Raspberry Pi often blocked)
+        "--ignore-gpu-blocklist"
+
+        # Enable hardware overlays
+        "--enable-hardware-overlays"
+      ];
+    })
 
     # Terminal emulator for i3
     alacritty
@@ -110,6 +136,10 @@
     pciutils
     usbutils
     htop
+
+    # Hardware video acceleration tools
+    libva-utils # vainfo command
+    v4l-utils # v4l2 video utilities
   ];
 
   # GnuPG with SSH support
@@ -142,10 +172,16 @@
   # Xbox controller support via Bluetooth
   hardware.xpadneo.enable = true;
 
-  # OpenGL support for graphics (important for video playback and streaming)
+  # OpenGL and hardware video decode support
   hardware.graphics = {
     enable = true;
     # 32-bit support is not available on aarch64
+
+    # Enable VAAPI drivers for hardware video decoding
+    extraPackages = with pkgs; [
+      libva
+      mesa
+    ];
   };
 
   # Disable features that aren't available on aarch64

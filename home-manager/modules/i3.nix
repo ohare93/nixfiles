@@ -32,8 +32,13 @@ in
           # Start notification daemon
           exec --no-startup-id ${pkgs.dunst}/bin/dunst
 
-          # Use Mouse+$mod to drag floating windows
-          floating_modifier $mod
+        # Use Mouse+$mod to drag floating windows
+        floating_modifier $mod
+        # Start compositor for better fullscreen performance
+        exec --no-startup-id ${pkgs.picom}/bin/picom -b
+
+        # Use Mouse+$mod to drag floating windows
+        floating_modifier $mod
 
           # Terminal
           bindsym $mod+Return exec ${pkgs.alacritty}/bin/alacritty
@@ -44,11 +49,24 @@ in
           # App launcher (Rofi with icons)
           bindsym $mod+d exec ${pkgs.rofi}/bin/rofi -show drun -show-icons
 
-          # Change focus (vim keys)
-          bindsym $mod+h focus left
-          bindsym $mod+j focus down
-          bindsym $mod+k focus up
-          bindsym $mod+l focus right
+        # Change focus (vim keys)
+        bindsym $mod+h focus left
+        bindsym $mod+j focus down
+        bindsym $mod+k focus up
+        bindsym $mod+l focus right
+        # Audio controls (PipeWire/WirePlumber)
+        bindsym XF86AudioRaiseVolume exec ${pkgs.wireplumber}/bin/wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
+        bindsym XF86AudioLowerVolume exec ${pkgs.wireplumber}/bin/wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+        bindsym XF86AudioMute exec ${pkgs.wireplumber}/bin/wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+
+        # Restart PipeWire (fixes HDMI audio issues on Raspberry Pi)
+        bindsym $mod+Shift+a exec systemctl --user restart pipewire wireplumber
+
+        # Change focus (vim keys)
+        bindsym $mod+h focus left
+        bindsym $mod+j focus down
+        bindsym $mod+k focus up
+        bindsym $mod+l focus right
 
           # Arrow keys also work
           bindsym $mod+Left focus left
@@ -345,7 +363,7 @@ in
 
         # Fonts
         noto-fonts
-        noto-fonts-emoji
+        noto-fonts-color-emoji
 
         # Utilities
         xdotool
@@ -365,6 +383,9 @@ in
 
         # Notification daemon
         dunst
+
+        # Compositor for fullscreen performance
+        picom
       ];
 
       # GTK theme for better appearance
@@ -407,6 +428,26 @@ in
             foreground = "#ffffff";
             frame_color = "#ff0000";
           };
+        };
+      };
+
+      # Enable compositor for better fullscreen performance
+      # Using xrender backend for better Raspberry Pi compatibility
+      services.picom = {
+        enable = true;
+        backend = "xrender";
+        vSync = true;
+        settings = {
+          # Disable effects for better performance
+          shadow = false;
+          fading = false;
+
+          # Basic performance settings
+          use-damage = true;
+          detect-client-opacity = true;
+
+          # Disable compositing for fullscreen windows (huge performance gain)
+          unredir-if-possible = true;
         };
       };
     };
