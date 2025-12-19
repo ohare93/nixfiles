@@ -7,6 +7,7 @@
 }: let
   cfg = config.mynix.zsh;
   sharedAliases = import ./shared-aliases.nix {inherit lib hostname;};
+  customPackages = import ../packages {inherit pkgs lib;};
 in
   with lib; {
     options.mynix = {
@@ -33,6 +34,11 @@ in
               name = "zsh-vi-mode";
               src = pkgs.zsh-vi-mode;
               file = "share/zsh-vi-mode/zsh-vi-mode.plugin.zsh";
+            }
+            {
+              name = "zsh-ai-cmd";
+              src = customPackages.zsh-ai-cmd;
+              file = "share/zsh-ai-cmd/zsh-ai-cmd.plugin.zsh";
             }
           ];
 
