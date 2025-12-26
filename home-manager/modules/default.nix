@@ -23,7 +23,6 @@ in {
     ./elm.nix
     ./devbox.nix
     ./immich.nix
-    ./waybar-updates.nix
     ./television.nix
     ./yazi.nix
     ./kitty.nix

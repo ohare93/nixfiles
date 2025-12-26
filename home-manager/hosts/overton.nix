@@ -12,7 +12,6 @@
     gui-software.enable = true;
     hyprland.enable = true;
     syncthing.enable = true;
-    waybar-updates.enable = true;
 
     # Shell and terminal
     zsh.enable = true;

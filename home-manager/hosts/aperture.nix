@@ -12,7 +12,6 @@
     gui-software.enable = true;
     plasma.enable = true; # KDE Plasma instead of Hyprland
     syncthing.enable = true;
-    waybar-updates.enable = false; # Not needed for Plasma
 
     # Shell and terminal
     zsh.enable = true;

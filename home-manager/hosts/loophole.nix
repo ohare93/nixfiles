@@ -46,6 +46,5 @@
     gui-software.enable = false;
     hyprland.enable = false;
     syncthing.enable = false;
-    waybar-updates.enable = false;
   };
 }
