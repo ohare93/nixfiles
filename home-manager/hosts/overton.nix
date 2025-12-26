@@ -49,5 +49,6 @@
     yazi.enable = true;
     stmp.enable = true;
     bitwarden.enable = true;
+    typst.enable = true;
   };
 }

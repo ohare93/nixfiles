@@ -31,6 +31,7 @@ in {
     ./neomutt.nix
     ./stmp.nix
     ./bitwarden.nix
+    ./typst.nix
     inputs.immich-auto-uploader.nixosModules.home-manager
   ];
 
