@@ -2,6 +2,7 @@
   lib,
   pkgs,
   inputs,
+  config,
   ...
 }: {
   imports = [
@@ -82,8 +83,21 @@
     neofetch
   ];
 
+  # Agenix configuration
+  age.identityPaths = ["/home/jmo/.ssh/agenix"];
+  age.secrets.skylight-signing-key = {
+    file = ../../secrets/skylight-signing-key.age;
+    mode = "400";
+  };
+
   mynix = {
     # Enable any common modules you want on the VM
     # This VM is primarily a headless build machine
+
+    # Sign all built paths so other machines can receive them
+    nix-signing = {
+      enableSigning = true;
+      signingKeyFile = config.age.secrets.skylight-signing-key.path;
+    };
   };
 }

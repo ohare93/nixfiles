@@ -1,4 +1,8 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  config,
+  ...
+}: {
   imports = [
     ./hardware-configuration.nix
     ./kanata.nix
@@ -25,12 +29,25 @@
   # Enable ARM emulation for building RPi5 installer
   # boot.binfmt.emulatedSystems = ["aarch64-linux"];
 
+  # Agenix configuration
+  age.identityPaths = ["/home/jmo/.ssh/agenix"];
+  age.secrets.overton-signing-key = {
+    file = ../../secrets/overton-signing-key.age;
+    mode = "400";
+  };
+
   mynix = {
     podman.enable = true;
     displaylink.enable = true;
     hyprland-system.enable = true;
     battery-protection.enable = true; # Laptop dies at ~30% due to miscalibration
     agentic-coding.enable = true; # AI and agent development tools
+
+    # Sign all built paths so other machines can receive them
+    nix-signing = {
+      enableSigning = true;
+      signingKeyFile = config.age.secrets.overton-signing-key.path;
+    };
   };
 
   hardware.bluetooth.enable = true;

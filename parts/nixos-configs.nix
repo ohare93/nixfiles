@@ -97,6 +97,7 @@
         # Import essential modules for keyboard and nix features
         ../nixos/modules/localisation.nix
         ../nixos/modules/nix-setup.nix
+        ../nixos/modules/nix-signing.nix
 
         # Then common system configuration
         # Note: ./nixos imports are selective to avoid conflicts with RPi modules
