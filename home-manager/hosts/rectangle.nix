@@ -27,16 +27,15 @@
     ncdu
     xclip
     wl-clipboard
-    inputs.nixpkgs.legacyPackages.${pkgs.system}.jujutsu
   ];
 
-  programs.jujutsu.enable = lib.mkForce false;
+  programs.jujutsu.package = inputs.nixpkgs.legacyPackages.${pkgs.system}.jujutsu;
 
   mynix = {
     i3.enable = true;
     kitty.enable = true;
     zsh.enable = true;
-    starship.enable = false;
+    starship.enable = true;
     nushell.enable = false;
 
     terminal-misc = {
