@@ -40,7 +40,10 @@
     podman.enable = true;
     displaylink.enable = true;
     hyprland-system.enable = true;
-    battery-protection.enable = true; # Laptop dies at ~30% due to miscalibration
+    battery-protection = {
+      enable = true; # Laptop dies at ~30% due to miscalibration
+      upower.criticalPowerAction = "Ignore"; # Disable auto-sleep at 35%
+    };
     agentic-coding.enable = true; # AI and agent development tools
 
     # Sign all built paths so other machines can receive them
