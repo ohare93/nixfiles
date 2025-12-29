@@ -55,6 +55,9 @@
 
   hardware.bluetooth.enable = true;
 
+  # Open port for ttyd (web terminal for zellij access from phone)
+  networking.firewall.allowedTCPPorts = [7681];
+
   # udev rule for automatic monitor hotplug detection
   # Triggers hypr-display-switcher service when monitors are plugged/unplugged
   services.udev.extraRules = ''
