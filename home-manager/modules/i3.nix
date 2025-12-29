@@ -37,6 +37,11 @@ in
         # Start compositor for better fullscreen performance
         exec --no-startup-id ${pkgs.picom}/bin/picom -b
 
+        # Disable screen blanking completely
+        exec --no-startup-id ${pkgs.xorg.xset}/bin/xset s off
+        exec --no-startup-id ${pkgs.xorg.xset}/bin/xset -dpms
+        exec --no-startup-id ${pkgs.xorg.xset}/bin/xset s noblank
+
         # Use Mouse+$mod to drag floating windows
         floating_modifier $mod
 
@@ -299,7 +304,7 @@ in
           content-foreground = ''${colors.secondary}
           content-padding = 3
           content-font = 2
-          click-left = ${pkgs.moonlight-qt}/bin/moonlight-qt &
+          click-left = ${pkgs.moonlight-qt}/bin/moonlight &
 
           [module/jellyfin]
           type = custom/text

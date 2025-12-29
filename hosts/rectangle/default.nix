@@ -24,7 +24,8 @@
   boot.loader.generic-extlinux-compatible.enable = lib.mkForce false;
 
   # Fix DRM race condition: disable simpledrm modeset so vc4 can claim display
-  boot.kernelParams = ["simpledrm.modeset=0"];
+  # consoleblank=0 prevents kernel console from blanking
+  boot.kernelParams = ["simpledrm.modeset=0" "consoleblank=0"];
 
   # Enable NetworkManager for WiFi
   networking.networkmanager.enable = true;
@@ -98,6 +99,12 @@
   services.getty = {
     autologinUser = "jmo";
     helpLine = "Rectangle - Raspberry Pi 5 Streaming Client";
+  };
+
+  # Prevent system from sleeping/suspending on idle
+  services.logind.settings.Login = {
+    HandleLidSwitch = "ignore";
+    IdleAction = "ignore";
   };
 
   # Streaming and media packages
