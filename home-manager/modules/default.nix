@@ -37,6 +37,7 @@ in {
 
   # Add custom packages
   config.home.packages = [
+    customPackages.agent-deck
     customPackages.beads
   ];
 }

@@ -1,6 +1,6 @@
 # Home-manager configuration for overton
 # Primary GUI workstation with development tools
-{ ...}: {
+{ lib, ...}: {
   imports = [
     ../common/base.nix
     ../common/packages.nix
@@ -51,4 +51,6 @@
     bitwarden.enable = true;
     typst.enable = true;
   };
+
+  programs.zellij.enableZshIntegration = lib.mkForce false;
 }
