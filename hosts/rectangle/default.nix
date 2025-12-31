@@ -58,6 +58,14 @@
 
     windowManager.i3.enable = true;
     displayManager.lightdm.enable = true;
+
+    # Disable X screensaver and DPMS (runs before window manager starts)
+    # Fixes NixOS 24.05 screen blanking issue
+    displayManager.setupCommands = ''
+      ${pkgs.xorg.xset}/bin/xset s off
+      ${pkgs.xorg.xset}/bin/xset -dpms
+      ${pkgs.xorg.xset}/bin/xset s noblank
+    '';
   };
 
   # Auto-login to get to desktop quickly
@@ -202,6 +210,8 @@
     # Disable Gren (broken Haskell dependencies on aarch64)
     mynix.terminal-misc.gren.enable = lib.mkForce false;
 
+    # Enable zellij terminal multiplexer
+    mynix.terminal-misc.zellij.enable = lib.mkForce true;
   };
 
   # System state version

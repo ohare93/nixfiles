@@ -37,14 +37,6 @@ in
         # Start compositor for better fullscreen performance
         exec --no-startup-id ${pkgs.picom}/bin/picom -b
 
-        # Disable screen blanking completely
-        exec --no-startup-id ${pkgs.xorg.xset}/bin/xset s off
-        exec --no-startup-id ${pkgs.xorg.xset}/bin/xset -dpms
-        exec --no-startup-id ${pkgs.xorg.xset}/bin/xset s noblank
-
-        # Use Mouse+$mod to drag floating windows
-        floating_modifier $mod
-
           # Terminal
           bindsym $mod+Return exec ${pkgs.alacritty}/bin/alacritty
 
@@ -66,12 +58,6 @@ in
 
         # Restart PipeWire (fixes HDMI audio issues on Raspberry Pi)
         bindsym $mod+Shift+a exec systemctl --user restart pipewire wireplumber
-
-        # Change focus (vim keys)
-        bindsym $mod+h focus left
-        bindsym $mod+j focus down
-        bindsym $mod+k focus up
-        bindsym $mod+l focus right
 
           # Arrow keys also work
           bindsym $mod+Left focus left
