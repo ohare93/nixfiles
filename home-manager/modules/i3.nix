@@ -330,6 +330,15 @@ in
         executable = true;
       };
 
+      # Jellyfin Media Player MPV configuration
+      # Disable double-click fullscreen to prevent conflict with i3
+      home.file.".local/share/jellyfinmediaplayer/input.conf" = {
+        text = ''
+          # Disable double-click fullscreen toggle (conflicts with i3 WM)
+          MBTN_LEFT_DBL ignore
+        '';
+      };
+
       # Rofi configuration
       programs.rofi = {
         enable = true;
