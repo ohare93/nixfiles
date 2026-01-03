@@ -17,6 +17,9 @@
     kon = "sudo systemctl start kanata-laptop";
     koff = "sudo systemctl stop kanata-laptop";
     kstatus = "sudo systemctl status kanata-laptop";
+
+    # Audio/pipewire restart
+    audio-restart = "systemctl --user restart wireplumber pipewire pipewire-pulse";
   };
 
   # Shell-specific aliases that need different implementations
