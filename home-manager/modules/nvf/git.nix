@@ -20,7 +20,7 @@
       enable = true;
       gitsigns = {
         enable = true;
-        codeActions.enable = true;
+        codeActions.enable = false; # Disable to avoid deprecated null-ls
 
         # Git signs configuration
         setupOpts = {

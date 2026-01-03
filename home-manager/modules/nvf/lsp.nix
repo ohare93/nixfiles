@@ -144,7 +144,7 @@
         # Rust support (if needed)
         rust = {
           enable = true;
-          crates.enable = true;
+          crates.enable = false; # Disabled - triggers null_ls deprecation warning
           format.enable = true;
           lsp = {
             enable = true;
