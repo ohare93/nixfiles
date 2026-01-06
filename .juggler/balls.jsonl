@@ -1,4 +1,0 @@
-{"id":"nixfiles-5","intent":"alias fd and grep","priority":"medium","active_state":"ready","started_at":"2025-11-08T11:55:36.034365864+01:00","last_activity":"2025-11-08T11:55:36.034365864+01:00","update_count":0}
-{"id":"nixfiles-6","intent":"remove the local files","priority":"medium","active_state":"ready","started_at":"2025-11-13T07:31:32.153923737+01:00","last_activity":"2025-11-13T07:31:32.153923737+01:00","update_count":0}
-{"id":"nixfiles-7","intent":"put all my ssh keys in agenix","priority":"medium","active_state":"ready","started_at":"2025-11-13T07:32:28.567853213+01:00","last_activity":"2025-11-13T07:32:28.567853213+01:00","update_count":0}
-{"id":"nixfiles-8","intent":"Still fix qutebrowser dying each time I put the computer to sleep","priority":"medium","active_state":"ready","started_at":"2025-11-19T16:00:28.482982657+01:00","last_activity":"2025-11-19T16:00:28.482982657+01:00","update_count":0}

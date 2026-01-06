@@ -5,6 +5,7 @@
     # Global gitignore patterns
     ignores = [
       ".claude/settings.local.json"
+      ".agent"
     ];
   };
 }

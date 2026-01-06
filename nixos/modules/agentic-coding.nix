@@ -40,6 +40,10 @@ in
       # Network tools for agent testing
       httpie      # Better curl for API testing
       websocat    # WebSocket client
+
+      # Sandbox tools for Claude Code
+      socat       # Socket relay for sandbox communication
+      bubblewrap  # Lightweight sandboxing tool
     ];
   };
 }

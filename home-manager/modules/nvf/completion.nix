@@ -156,5 +156,42 @@
         toggleCurrentBlock = "gbc";
       };
     };
+
+    # Disable treesitter completion source for prose/non-code filetypes
+    # and enable spell checking
+    luaConfigRC.prose-mode = ''
+      -- Ensure spell directory exists and set spellfile for personal dictionary
+      local spell_dir = vim.fn.stdpath("data") .. "/spell"
+      vim.fn.mkdir(spell_dir, "p")
+      vim.opt.spellfile = spell_dir .. "/en.utf-8.add"
+
+      local prose_filetypes = {
+        "typst", "markdown", "text", "txt", "plaintex", "tex",
+        "rst", "asciidoc", "org", "norg", "mail", "gitcommit"
+      }
+
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = prose_filetypes,
+        callback = function()
+          -- Enable spell checking for prose
+          vim.opt_local.spell = true
+          vim.opt_local.spelllang = "en_gb"
+
+          local cmp = require("cmp")
+          local config = cmp.get_config()
+
+          -- Filter out treesitter source
+          local filtered_sources = {}
+          for _, source in ipairs(config.sources or {}) do
+            if source.name ~= "treesitter" then
+              table.insert(filtered_sources, source)
+            end
+          end
+
+          -- Apply filtered sources for this buffer
+          cmp.setup.buffer({ sources = filtered_sources })
+        end,
+      })
+    '';
   };
 }

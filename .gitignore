@@ -4,3 +4,6 @@ result-*
 
 # Private configuration (encrypted version is secrets/private.nix.age)
 private.nix
+
+# Juggler task tracking (local state)
+.juggle
