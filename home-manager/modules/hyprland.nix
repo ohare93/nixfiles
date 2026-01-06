@@ -81,6 +81,14 @@ in
             allow_tearing = false;
           };
 
+          # Master layout settings (for center-master mode)
+          # Used when toggling away from hy3 for ultrawide "bigger middle" layout
+          master = {
+            orientation = "center"; # Master window in center, slaves on sides
+            mfact = 0.5; # Master takes 50% of screen
+            slave_count_for_center_master = 2; # Center only with 2+ slaves
+          };
+
           # hy3 plugin settings for i3-style equal window splits
           # trigger_width=-1 = never vertical splits (no stacking top-bottom)
           # trigger_height=0 = always horizontal splits (windows side-by-side)
@@ -187,6 +195,9 @@ in
             "$mod, V, togglefloating," # Toggle floating
             "$mod, P, pseudo," # Pseudo tiling
             "$mod, F, fullscreen," # Toggle fullscreen
+
+            # Layout toggle - switch between hy3 (equal splits) and master-center (bigger middle)
+            "$mod, O, exec, ~/.config/hypr/toggle-layout.sh"
 
             # hy3 group management (for equal window splits)
             # Press SUPER+G before opening windows to create horizontal group
@@ -440,6 +451,25 @@ in
         executable = true;
       };
 
+      # Copy layout toggle script (hy3 <-> master-center)
+      home.file.".config/hypr/toggle-layout.sh" = {
+        text = ''
+          #!/usr/bin/env bash
+          # Toggle between hy3 (equal splits) and master (center-master for ultrawide)
+
+          current_layout=$(hyprctl getoption general:layout | grep "str:" | cut -d'"' -f2)
+
+          if [[ "$current_layout" == "hy3" ]]; then
+            hyprctl keyword general:layout master
+            notify-send "Layout" "Master (center-master mode)"
+          else
+            hyprctl keyword general:layout hy3
+            notify-send "Layout" "hy3 (equal splits)"
+          fi
+        '';
+        executable = true;
+      };
+
       # Install required packages for Hyprland ecosystem
       home.packages = with pkgs; [
         # Core Wayland tools
@@ -451,6 +481,9 @@ in
         wl-clipboard # Clipboard utilities
         cliphist # Clipboard manager
         brightnessctl # Brightness control
+
+        # Monitor configuration
+        hyprmon # TUI tool for Hyprland monitor configuration
 
         # Screen locking and idle management
         hyprlock # Hyprland's GPU-accelerated screen locker
