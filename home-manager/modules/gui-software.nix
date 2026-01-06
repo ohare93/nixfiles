@@ -18,6 +18,14 @@ in
       # Enable qutebrowser with custom configuration
       mynix.qutebrowser.enable = true;
 
+      # PDF viewer with clipboard support
+      programs.zathura = {
+        enable = true;
+        options = {
+          selection-clipboard = "clipboard";
+        };
+      };
+
       # Configure ungoogled-chromium with Browser MCP extension
       programs.chromium = {
         enable = true;
@@ -46,7 +54,6 @@ in
         telegram-desktop
         logseq
         zotero
-        zathura
         showmethekey
         caffeine-ng # Prevent screen sleep/lock
         libnotify
@@ -56,6 +63,10 @@ in
         openai-whisper
         wl-clipboard
         ffmpeg
+
+        # Office documents
+        libreoffice
+        poppler-utils # pdftoppm for yazi office preview
       ];
 
       xdg.mimeApps = {
