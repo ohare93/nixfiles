@@ -9,5 +9,8 @@
       jujutsu = _final: prev: {
         jujutsu = inputs.jj.packages.${prev.system}.default;
       };
+      hyprmon = _final: prev: {
+        hyprmon = inputs.hyprmon.packages.${prev.system}.default;
+      };
     };
 }

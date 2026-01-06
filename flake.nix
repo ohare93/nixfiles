@@ -86,6 +86,11 @@
       inputs.hyprland.follows = "hyprland";
     };
 
+    hyprmon = {
+      url = "github:erans/hyprmon";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Private configuration (requires manual SSH config - see README)
     private = {
       url = "git+ssh://private-git/jmo/nixfiles.private";
