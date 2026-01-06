@@ -45,3 +45,16 @@ bwcp() {
 	echo "$item" | jq -r '.login.password' | wl-copy
 	echo "$item" | jq -r '.login.username'
 }
+
+juggle() {
+	# Worktree-safe juggle: prefers local binary for isolation
+	if [[ -x "./juggle" ]]; then
+		./juggle "$@"
+	elif local root="$(git rev-parse --show-toplevel 2>/dev/null)" && [[ -x "$root/juggle" ]]; then
+		"$root/juggle" "$@"
+	else
+		~/Development/juggler/juggle "$@"
+	fi
+}
+
+alias j='juggle'

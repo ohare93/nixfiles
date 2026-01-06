@@ -8,8 +8,6 @@
     pip = "pip3";
     python = "python3";
     l = "eza --long --icons --all";
-    j = "~/Development/juggler/juggle";
-    juggle = "~/Development/juggler/juggle";
 
     # Git
     gitbranch = "git rev-parse --abbrev-ref HEAD";

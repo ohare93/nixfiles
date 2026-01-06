@@ -150,6 +150,24 @@ in
                 notify-send "Monitor" "5120x1440 (full width)"
               }
             }
+
+            # Worktree-safe juggle: prefers local binary for isolation
+            def juggle [...args] {
+              let local_binary = "./juggle"
+              let repo_root = (do { git rev-parse --show-toplevel } | complete)
+              let root_binary = if $repo_root.exit_code == 0 { $"($repo_root.stdout | str trim)/juggle" } else { "" }
+              let fallback = $"($env.HOME)/Development/juggler/juggle"
+
+              if ($local_binary | path exists) and (($local_binary | path type) == "file") {
+                run-external $local_binary ...$args
+              } else if ($root_binary != "") and ($root_binary | path exists) {
+                run-external $root_binary ...$args
+              } else {
+                run-external $fallback ...$args
+              }
+            }
+
+            alias j = juggle
           ''
           + (
             if config.mynix.terminal-misc.atuin.enable
