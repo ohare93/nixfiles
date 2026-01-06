@@ -10,7 +10,7 @@ stdenvNoCC.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "kylesnowschwartz";
     repo = "zsh-ai-cmd";
-    rev = "a49933bb38c7fb50f0a5c665b4e934035bc55aec";
+    rev = "a49933bb38c7fb50f0a5c665b4e934035bc55aec"; # main
     hash = "sha256-d7ZIJAhOkcc3hYEafD8bSSzwwabvH63SQpCsjsv33p0=";
   };
 

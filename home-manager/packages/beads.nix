@@ -5,18 +5,18 @@
   git,
   makeWrapper,
 }:
-buildGoModule rec {
+buildGoModule {
   pname = "beads";
-  version = "0.23.1";
+  version = "0.46.0";
 
   src = fetchFromGitHub {
     owner = "steveyegge";
     repo = "beads";
-    rev = "v${version}";
-    hash = "sha256-ibWPzNGUMk9NueWVR4xNS108ES2w1ulWL2ARB75xEig=";
+    rev = "v0.46.0"; # tags/v*
+    hash = "sha256-PMzLKb0pYKiXdiEXBFe6N4FZ3AaNfvBRZlQBKijtldc=";
   };
 
-  vendorHash = "sha256-eUwVXAe9d/e3OWEav61W8lI0bf/IIQYUol8QUiQiBbo=";
+  vendorHash = "sha256-BpACCjVk0V5oQ5YyZRv9wC/RfHw4iikc2yrejZzD1YU=";
 
   # Build the CLI tool from cmd/bd
   subPackages = ["cmd/bd"];

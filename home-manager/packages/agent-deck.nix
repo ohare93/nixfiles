@@ -5,15 +5,15 @@
   makeWrapper,
   tmux,
 }:
-buildGoModule rec {
+buildGoModule {
   pname = "agent-deck";
-  version = "0.8.4";
+  version = "0.8.20";
 
   src = fetchFromGitHub {
     owner = "asheshgoplani";
     repo = "agent-deck";
-    rev = "v${version}";
-    hash = "sha256-iLSsaGaN8TcDIkz9LDeqzz4rq6FIz/cDmgfz7KeRpbA=";
+    rev = "v0.8.20"; # tags/v*
+    hash = "sha256-uixAcmIQ9Tx+l3LhqG2XLQa8+v5Epj2IG5w5/iTOKoY=";
   };
 
   vendorHash = "sha256-X4n1zot+w6+2WGZmSrWaUnY9cp66G8H4MF70ZDgLD1E=";
