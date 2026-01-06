@@ -5,6 +5,13 @@
   ...
 }: let
   cfg = config.mynix.qutebrowser;
+
+  # Dependencies for qute-karakeep userscript
+  karakeepDeps = with pkgs; [
+    single-file-cli
+    curl
+    coreutils # for mktemp
+  ];
 in
   with lib; {
     options.mynix = {
@@ -23,6 +30,8 @@ in
         keyBindings = {
           normal = {
             "wtt" = "write-to-tech";
+            "wka" = "karakeep"; # Archive current page to Karakeep
+            "wkh" = "Karakeep"; # Archive hinted link to Karakeep
           };
         };
 
@@ -47,7 +56,9 @@ in
           c.aliases = {
               "write-to-tech": "spawn zsh -c 'cd ~/Notes/logseq_dc && echo \"- {url}\" >> `zk getmonthly`'",
               "zotero": "spawn --userscript qute-zotero",
-              "Zotero": "hint links userscript qute-zotero"
+              "Zotero": "hint links userscript qute-zotero",
+              "karakeep": "spawn --userscript qute-karakeep",
+              "Karakeep": "hint links userscript qute-karakeep"
           }
 
           # Search engines setting
@@ -76,6 +87,16 @@ in
           #!/usr/bin/env bash
           export PATH="${pkgs.python3.withPackages (ps: with ps; [requests])}/bin:$PATH"
           exec python3 ${./qute-zotero} "$@"
+        '';
+        executable = true;
+      };
+
+      # Install qute-karakeep userscript for archiving to Karakeep via SingleFile
+      home.file.".local/share/qutebrowser/userscripts/qute-karakeep" = {
+        source = pkgs.writeShellScript "qute-karakeep" ''
+          #!/usr/bin/env bash
+          export PATH="${lib.makeBinPath karakeepDeps}:$PATH"
+          exec bash ${./qute-karakeep} "$@"
         '';
         executable = true;
       };

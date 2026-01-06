@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+# Qutebrowser userscript to archive pages to Karakeep using SingleFile CLI
+#
+# Configuration:
+#   Set these environment variables in ~/.config/karakeep-archive/config:
+#     KARAKEEP_SERVER_URL - Your Karakeep server URL (e.g., https://karakeep.example.com)
+#     KARAKEEP_API_KEY - Your Karakeep API key
+#
+# Usage from qutebrowser:
+#   :spawn --userscript qute-karakeep
+#   Or via hint mode: :hint links userscript qute-karakeep
+
+set -euo pipefail
+
+# Load configuration
+CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/karakeep-archive/config"
+if [[ -f "$CONFIG_FILE" ]]; then
+    # shellcheck source=/dev/null
+    source "$CONFIG_FILE"
+fi
+
+# Validate configuration
+if [[ -z "${KARAKEEP_SERVER_URL:-}" ]]; then
+    echo "message-error 'Karakeep: KARAKEEP_SERVER_URL not configured in $CONFIG_FILE'" >> "$QUTE_FIFO"
+    exit 1
+fi
+
+if [[ -z "${KARAKEEP_API_KEY:-}" ]]; then
+    echo "message-error 'Karakeep: KARAKEEP_API_KEY not configured in $CONFIG_FILE'" >> "$QUTE_FIFO"
+    exit 1
+fi
+
+# Get the URL to archive
+URL="${QUTE_URL}"
+
+echo "message-info 'Karakeep: Archiving $URL...'" >> "$QUTE_FIFO"
+
+# Create a temporary file for the HTML
+TEMP_HTML=$(mktemp --suffix=.html)
+trap 'rm -f "$TEMP_HTML"' EXIT
+
+# Use single-file-cli to capture the page
+# We use the URL directly rather than QUTE_HTML because single-file-cli
+# captures the page more completely (with styles, images, etc.)
+if ! single-file "$URL" "$TEMP_HTML" 2>/dev/null; then
+    echo "message-error 'Karakeep: SingleFile capture failed'" >> "$QUTE_FIFO"
+    exit 1
+fi
+
+# Upload to Karakeep
+# The API expects multipart form data with 'file' and 'url' fields
+RESPONSE=$(curl -s -w "%{http_code}" -o /dev/null \
+    -X POST "${KARAKEEP_SERVER_URL}/api/v1/bookmarks/singlefile" \
+    -H "Authorization: Bearer ${KARAKEEP_API_KEY}" \
+    -F "file=@${TEMP_HTML};type=text/html" \
+    -F "url=${URL}")
+
+if [[ "$RESPONSE" == "201" || "$RESPONSE" == "200" ]]; then
+    echo "message-info 'Karakeep: Successfully archived $URL'" >> "$QUTE_FIFO"
+else
+    echo "message-error 'Karakeep: Upload failed (HTTP $RESPONSE)'" >> "$QUTE_FIFO"
+    exit 1
+fi
