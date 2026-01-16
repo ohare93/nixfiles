@@ -46,5 +46,6 @@
     notes.zk.enable = true;
     television.enable = true;
     yazi.enable = true;
+    espanso.enable = true;
   };
 }

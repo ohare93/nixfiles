@@ -21,6 +21,7 @@ in {
     ./nvf
     ./notes.nix
     ./elm.nix
+    ./espanso.nix
     ./devbox.nix
     ./immich.nix
     ./television.nix

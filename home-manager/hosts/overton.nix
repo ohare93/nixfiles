@@ -50,6 +50,7 @@
     stmp.enable = true;
     bitwarden.enable = true;
     typst.enable = true;
+    espanso.enable = true;
   };
 
   programs.zellij.enableZshIntegration = lib.mkForce false;
