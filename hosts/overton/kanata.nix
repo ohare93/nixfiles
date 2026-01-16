@@ -52,12 +52,12 @@
             i-ctrl (tap-hold 200 300 i rctl)
             g-super (tap-hold 200 300 g lmet)
             m-super (tap-hold 200 300 m rmet)
-            ;; One-shot modifiers for bottom row
-            lctl-os (one-shot 1000 lctl)
-            lmet-os (one-shot 1000 lmet)
-            lalt-os (one-shot 1000 lalt)
-            ralt-os (one-shot 1000 ralt)
-            rctl-os (one-shot 1000 rctl)
+            ;; One-shot modifiers for bottom row (shorter 400ms timeout to avoid sticky feeling)
+            lctl-os (one-shot 400 lctl)
+            lmet-os (one-shot 400 lmet)
+            lalt-os (one-shot 400 lalt)
+            ralt-os (one-shot 400 ralt)
+            rctl-os (one-shot 400 rctl)
           )
 
           ;; Colemak-DH target layer using deflayermap for cleaner Danish key mapping
