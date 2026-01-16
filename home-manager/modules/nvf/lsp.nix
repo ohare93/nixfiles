@@ -233,9 +233,7 @@
             json = ["prettier"];
           };
           formatters = {
-            prettier = {
-              args = ["--parser" "html" "--stdin-filepath" "$FILENAME"];
-            };
+            prettier = {};
           };
         };
       };
@@ -266,6 +264,18 @@
               callback = function()
                 vim.bo.filetype = "gren"
               end,
+            })
+
+          # JSON LSP configuration
+          jsonLsp = ''
+            require('lspconfig').jsonls.setup({
+              cmd = { "${pkgs.vscode-langservers-extracted}/bin/vscode-json-language-server", "--stdio" },
+              filetypes = { "json", "jsonc" },
+              settings = {
+                json = {
+                  validate = { enable = true },
+                },
+              },
             })
           '';
         }
