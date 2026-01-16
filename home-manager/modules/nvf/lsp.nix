@@ -266,6 +266,30 @@
               end,
             })
 
+            -- Detect MDX files
+            vim.api.nvim_create_autocmd({"BufRead", "BufNewFile"}, {
+              pattern = "*.mdx",
+              callback = function()
+                vim.bo.filetype = "mdx"
+              end,
+            })
+          '';
+
+          # MDX LSP configuration
+          mdxLsp = ''
+            -- Custom MDX LSP configuration
+            local lspconfig = require('lspconfig')
+            local capabilities = vim.lsp.protocol.make_client_capabilities()
+            capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
+
+            lspconfig.mdx_analyzer.setup({
+              capabilities = capabilities,
+              cmd = { "${pkgs.mdx-language-server}/bin/mdx-language-server", "--stdio" },
+              filetypes = { "mdx" },
+              root_dir = lspconfig.util.root_pattern("package.json", ".git"),
+            })
+          '';
+
           # JSON LSP configuration
           jsonLsp = ''
             require('lspconfig').jsonls.setup({
