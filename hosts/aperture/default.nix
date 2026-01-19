@@ -19,6 +19,7 @@
   # Enable custom modules
   mynix = {
     battery-protection.enable = true; # Optimize battery health for tablet
+    uinput.enable = true; # Required for espanso
   };
 
   # Disable power-profiles-daemon (conflicts with TLP from battery-protection)

@@ -1,19 +1,8 @@
 {
   ...
 }: {
-  # Enable uinput module for kanata
-  boot.kernelModules = ["uinput"];
-
-  # Enable uinput hardware support
-  hardware.uinput.enable = true;
-
-  # Set up udev rules for uinput access
-  services.udev.extraRules = ''
-    KERNEL=="uinput", MODE="0660", GROUP="uinput", OPTIONS+="static_node=uinput"
-  '';
-
-  # Ensure uinput group exists
-  users.groups.uinput = {};
+  # Use shared uinput module
+  mynix.uinput.enable = true;
 
   # Kanata keyboard remapping service
   services.kanata = {

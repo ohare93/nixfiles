@@ -11,5 +11,6 @@
     ./hyprland.nix
     ./battery-protection.nix
     ./agentic-coding.nix
+    ./uinput.nix
   ];
 }
