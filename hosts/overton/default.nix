@@ -53,6 +53,11 @@
     };
   };
 
+  # Restart user services that lose connections during sleep/resume
+  powerManagement.resumeCommands = ''
+    systemctl --user --machine=jmo@ restart ntfy-notifications.service || true
+  '';
+
   hardware.bluetooth.enable = true;
 
   # Open port for ttyd (web terminal for zellij access from phone)

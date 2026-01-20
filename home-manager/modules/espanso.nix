@@ -16,6 +16,9 @@ in
     };
 
     config = mkIf cfg.enable {
+      # wtype is required for text injection on Wayland
+      home.packages = [pkgs.wtype];
+
       # Deploy emoji package as a file (too large for inline Nix)
       xdg.configFile."espanso/match/packages/all-emojis/package.yml".source = ../config/espanso/all-emojis.yml;
 
@@ -23,7 +26,9 @@ in
         enable = true;
         configs = {
           default = {
-            # Global settings - mostly defaults, can be customized here
+            keyboard_layout = {
+              layout = "dk";
+            };
           };
           firefox = {
             filter_class = "Firefox";

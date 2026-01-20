@@ -51,6 +51,9 @@
     bitwarden.enable = true;
     typst.enable = true;
     espanso.enable = true;
+
+    # Self-employment tools (Slack, Notion)
+    self-employed.enable = true;
   };
 
   programs.zellij.enableZshIntegration = lib.mkForce false;

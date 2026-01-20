@@ -68,7 +68,7 @@
   users.users.jmo = {
     isNormalUser = true;
     description = inputs.private.identity.fullName;
-    extraGroups = ["networkmanager" "wheel" "uinput"];
+    extraGroups = ["networkmanager" "wheel" "uinput" "input"];
     shell = pkgs.zsh;
     packages = with pkgs; [];
   };

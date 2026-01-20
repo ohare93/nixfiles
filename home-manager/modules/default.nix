@@ -13,6 +13,7 @@ in {
     ./git.nix
     ./gui-software.nix
     ./qutebrowser.nix
+    ./firefox.nix
     ./hyprland.nix
     ./i3.nix
     ./zsh.nix
@@ -33,6 +34,7 @@ in {
     ./stmp.nix
     ./bitwarden.nix
     ./typst.nix
+    ./self-employed.nix
     inputs.immich-auto-uploader.nixosModules.home-manager
   ];
 

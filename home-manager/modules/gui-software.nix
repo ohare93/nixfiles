@@ -18,6 +18,12 @@ in
       # Enable qutebrowser with custom configuration
       mynix.qutebrowser.enable = true;
 
+      # Enable Firefox with Tridactyl and set as default browser
+      mynix.firefox = {
+        enable = true;
+        defaultBrowser = true;
+      };
+
       # PDF viewer with clipboard support
       programs.zathura = {
         enable = true;
@@ -45,7 +51,6 @@ in
       };
 
       home.packages = with pkgs; [
-        firefox
         wireguard-ui
         bitwarden-desktop
         plexamp
@@ -72,11 +77,6 @@ in
       xdg.mimeApps = {
         enable = true;
         defaultApplications = {
-          # Web browsing - qutebrowser as default
-          "text/html" = "org.qutebrowser.qutebrowser.desktop";
-          "x-scheme-handler/http" = "org.qutebrowser.qutebrowser.desktop";
-          "x-scheme-handler/https" = "org.qutebrowser.qutebrowser.desktop";
-
           # PDF viewer - zathura as default
           "application/pdf" = "org.pwmt.zathura.desktop";
 
@@ -90,8 +90,6 @@ in
           "x-scheme-handler/logseq" = "Logseq.desktop";
         };
       };
-
-      home.sessionVariables.BROWSER = "qutebrowser";
 
       # Speech-to-text script
       home.file.".local/bin/stt" = {

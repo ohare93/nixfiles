@@ -91,6 +91,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Nix User Repository (for Firefox addons like Tridactyl)
+    nur = {
+      url = "github:nix-community/NUR";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Private configuration (requires manual SSH config - see README)
     private = {
       url = "git+ssh://private-git/jmo/nixfiles.private";

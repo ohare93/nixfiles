@@ -12,5 +12,6 @@
       hyprmon = _final: prev: {
         hyprmon = inputs.hyprmon.packages.${prev.system}.default;
       };
+      nur = inputs.nur.overlays.default;
     };
 }
