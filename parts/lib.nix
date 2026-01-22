@@ -1,12 +1,13 @@
 _: {
   # Shared library functions and constants
-  flake.lib = {
+  flake.lib = rec {
     # Unfree packages to allow
     unfreePackages = [
       "displaylink"
       "plexamp"
       "keymapp"
       "claude-code"
+      "slack"
     ];
 
     # Broken packages to allow
@@ -18,19 +19,12 @@ _: {
     allowUnfreePredicate = pkg:
       builtins.elem
       (pkg.pname or (builtins.parseDrvName pkg.name).name)
-      [
-        "displaylink"
-        "plexamp"
-        "keymapp"
-        "claude-code"
-      ];
+      unfreePackages;
 
     # Predicate function for broken packages
     allowBrokenPredicate = pkg:
       builtins.elem
       (pkg.pname or (builtins.parseDrvName pkg.name).name)
-      [
-        "prettyprint-avh4"
-      ];
+      brokenPackages;
   };
 }
