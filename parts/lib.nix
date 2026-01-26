@@ -8,6 +8,7 @@ _: {
       "keymapp"
       "claude-code"
       "slack"
+      "zoom"
     ];
 
     # Broken packages to allow
