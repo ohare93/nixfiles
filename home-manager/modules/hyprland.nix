@@ -184,8 +184,8 @@ in
             # Terminal - Super+Return (most important shortcut)
             "$mod, Return, exec, kitty"
 
-            # Browser - Super+B
-            "$mod, B, exec, qutebrowser"
+            # Browser - Super+B (uses $BROWSER from session variables)
+            "$mod, B, exec, $BROWSER"
 
             # Application launcher - Super+D
             "$mod, D, exec, rofi -show drun"
