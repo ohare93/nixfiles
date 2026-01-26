@@ -7,3 +7,17 @@ private.nix
 
 # Juggler task tracking (local state)
 .juggle
+
+# Sandbox/editor artifacts
+.bash_profile
+.bashrc
+.gitconfig
+.gitmodules
+.profile
+.ripgreprc
+.zprofile
+.zshrc
+.idea
+.vscode
+.mcp.json
+
