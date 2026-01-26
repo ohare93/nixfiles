@@ -19,6 +19,11 @@
     hyprland-system.enable = true;
   };
 
+  # Restart user services that may break during sleep/resume
+  powerManagement.resumeCommands = ''
+    systemctl --user --machine=jmo@ restart espanso.service || true
+  '';
+
   hardware.bluetooth.enable = true;
 
   # Enable the X11 windowing system.

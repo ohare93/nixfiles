@@ -22,6 +22,18 @@ in
       # Deploy emoji package as a file (too large for inline Nix)
       xdg.configFile."espanso/match/packages/all-emojis/package.yml".source = ../config/espanso/all-emojis.yml;
 
+      # Override systemd service to wait for graphical session and use capability-wrapped binary
+      systemd.user.services.espanso = {
+        Unit = {
+          After = ["graphical-session.target"];
+          Wants = ["graphical-session.target"];
+        };
+        Service = {
+          # Use the capability-wrapped binary from security.wrappers
+          ExecStart = lib.mkForce "/run/wrappers/bin/espanso launcher";
+        };
+      };
+
       services.espanso = {
         enable = true;
         configs = {

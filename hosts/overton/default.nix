@@ -56,6 +56,7 @@
   # Restart user services that lose connections during sleep/resume
   powerManagement.resumeCommands = ''
     systemctl --user --machine=jmo@ restart ntfy-notifications.service || true
+    systemctl --user --machine=jmo@ restart espanso.service || true
   '';
 
   hardware.bluetooth.enable = true;
