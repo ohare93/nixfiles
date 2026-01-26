@@ -21,14 +21,32 @@ in
         # Use the default Firefox package
         package = pkgs.firefox;
 
+        # Native messaging hosts for extensions
+        nativeMessagingHosts = [
+          pkgs.tridactyl-native
+        ];
+
         # Firefox policies for system-wide settings
         policies = {
           # Disable telemetry
           DisableTelemetry = true;
           DisableFirefoxStudies = true;
 
-          # Enable user chrome customization (for Tridactyl theme integration)
-          # Note: toolkit.legacyUserProfileCustomizations.stylesheets must be true in about:config
+          # Search engine configuration
+          SearchEngines = {
+            Add = [
+              {
+                Name = "Kagi";
+                URLTemplate = "https://kagi.com/search?q={searchTerms}";
+                Method = "GET";
+                IconURL = "https://kagi.com/favicon.ico";
+                Alias = "@kagi";
+                Description = "Kagi Search";
+              }
+            ];
+            Default = "Kagi";
+            Remove = ["Google" "Bing" "Amazon.com" "eBay"];
+          };
         };
 
         # Default profile configuration
@@ -41,6 +59,8 @@ in
             tridactyl
             tree-style-tab
             darkreader
+            auto-tab-discard
+            single-file
           ];
 
           # Hide horizontal tab bar (using Tree Style Tab for vertical tabs)
@@ -79,9 +99,7 @@ in
             # Use system locale
             "intl.regional_prefs.use_os_locales" = true;
 
-            # Set search engine to DuckDuckGo by default
-            "browser.search.defaultenginename" = "DuckDuckGo";
-            "browser.search.order.1" = "DuckDuckGo";
+            # Search engine is set via policies (Kagi)
 
             # Disable autofill
             "browser.formfill.enable" = false;
@@ -97,6 +115,12 @@ in
 
             # Session restore (like qutebrowser's auto_save.session = true)
             "browser.startup.page" = 3; # Restore previous session
+
+            # Tab unloading - ensure built-in unloading is active
+            "browser.tabs.unloadOnLowMemory" = true;
+
+            # Limit content processes to reduce memory (default 8, lower = less RAM)
+            # "dom.ipc.processCount" = 4;
           };
 
           # Tridactyl configuration
@@ -197,6 +221,9 @@ in
         " Escape to normal mode from insert mode
         bind --mode=insert <Escape> composite unfocus | mode normal
 
+        " Toggle ignore mode (Ctrl+e) - passes all keys to the page
+        bind <C-e> mode ignore
+
         " gi to focus first input
         bind gi focusinput -l
 
@@ -205,6 +232,22 @@ in
 
         " Disable some default bindings that conflict with website shortcuts
         unbind <C-f>
+
+        " Tree Style Tab integration
+        " T - open new tab as child of current tab
+        bind T composite tabopen -b | tstattach %
+
+        " Tree navigation - indent/outdent
+        bind > js browser.runtime.sendMessage("treestyletab@piro.sakura.ne.jp", {type: "indent", tab: "current"})
+        bind < js browser.runtime.sendMessage("treestyletab@piro.sakura.ne.jp", {type: "outdent", tab: "current"})
+
+        " Tree folding (vim-style)
+        bind zc js browser.runtime.sendMessage("treestyletab@piro.sakura.ne.jp", {type: "collapse-tree", tab: "current"})
+        bind zo js browser.runtime.sendMessage("treestyletab@piro.sakura.ne.jp", {type: "expand-tree", tab: "current"})
+        bind za js browser.runtime.sendMessage("treestyletab@piro.sakura.ne.jp", {type: "toggle-tree-collapsed", tab: "current"})
+
+        " Toggle TST sidebar
+        bind zs sidebar treestyletab_piro_sakura_ne_jp-sidebar-action
 
         " Site-specific settings
         " Disable Tridactyl on sites where it conflicts
