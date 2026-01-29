@@ -2,7 +2,14 @@
   flake.overlays =
     import ../overlays {inherit inputs;}
     // {
-      claude-code = inputs.claude-code.overlays.default;
+      llm-agents = _final: prev: {
+        llm-agents = {
+          claude-code = inputs.llm-agents.packages.${prev.system}.claude-code;
+          codex = inputs.llm-agents.packages.${prev.system}.codex;
+          gemini-cli = inputs.llm-agents.packages.${prev.system}.gemini-cli;
+          opencode = inputs.llm-agents.packages.${prev.system}.opencode;
+        };
+      };
       zjstatus = _final: prev: {
         zjstatus = inputs.zjstatus.packages.${prev.system}.default;
       };

@@ -34,6 +34,8 @@
       fzf.enable = true;
       carapace.enable = true;
       claude.enable = true;
+      codex.enable = true;
+      gemini.enable = true;
       devbox.enable = true;
       poetry.enable = true;
       comma.enable = true;

@@ -17,6 +17,8 @@ in
         fzf.enable = mkEnableOption "fzf";
         carapace.enable = mkEnableOption "carapace";
         claude.enable = mkEnableOption "claude";
+        codex.enable = mkEnableOption "codex";
+        gemini.enable = mkEnableOption "gemini";
         devbox.enable = mkEnableOption "devbox";
         poetry.enable = mkEnableOption "poetry";
         comma.enable = mkEnableOption "comma";
@@ -28,12 +30,14 @@ in
 
     config = {
       home.packages =
-        lib.optional cfg.claude.enable pkgs.claude-code
+        lib.optional cfg.claude.enable pkgs.llm-agents.claude-code
+        ++ lib.optional cfg.codex.enable pkgs.llm-agents.codex
+        ++ lib.optional cfg.gemini.enable pkgs.llm-agents.gemini-cli
         ++ lib.optional cfg.devbox.enable pkgs.devbox
         ++ lib.optional cfg.comma.enable pkgs.comma
         ++ lib.optional cfg.gren.enable pkgs.gren
         ++ lib.optional cfg.nvd.enable pkgs.nvd
-        ++ lib.optional cfg.opencode.enable pkgs.opencode;
+        ++ lib.optional cfg.opencode.enable pkgs.llm-agents.opencode;
 
       xdg.configFile = mkMerge [
         (mkIf cfg.zellij.enable {
