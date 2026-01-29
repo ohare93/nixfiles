@@ -134,6 +134,44 @@
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
+  programs.nix-ld = {
+    enable = true;
+    libraries = with pkgs; [
+      # Electron / GTK dependencies
+      glib
+      nss
+      nspr
+      atk
+      cups
+      dbus
+      libdrm
+      gtk3
+      pango
+      cairo
+      xorg.libX11
+      xorg.libXcomposite
+      xorg.libXdamage
+      xorg.libXext
+      xorg.libXfixes
+      xorg.libXrandr
+      xorg.libxcb
+      mesa
+      libgbm
+      xorg.libxshmfence
+      xorg.libXcursor
+      xorg.libXi
+      xorg.libXrender
+      xorg.libXtst
+      pciutils
+      expat
+      alsa-lib
+      at-spi2-atk
+      at-spi2-core
+      libxkbcommon
+      libglvnd
+    ];
+  };
+
   programs.gnupg.agent = {
     enable = true;
     enableSSHSupport = true;
