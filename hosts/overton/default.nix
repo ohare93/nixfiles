@@ -10,6 +10,11 @@
 
   system.stateVersion = "25.05";
 
+  swapDevices = [{
+    device = "/swapfile";
+    size = 10 * 1024; # 10GB
+  }];
+
   # Add nixos-raspberrypi binary cache for cross-compilation
   nix.settings = {
     substituters = [
