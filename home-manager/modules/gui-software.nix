@@ -155,7 +155,7 @@ in
           # Open each URL in the browser
           if [ -n "$URLS" ]; then
             while IFS= read -r URL; do
-              ${pkgs.qutebrowser}/bin/qutebrowser "$URL" &
+              $BROWSER "$URL" &
             done <<< "$URLS"
           fi
 
