@@ -14,6 +14,8 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
     flake-parts.url = "github:hercules-ci/flake-parts";
+    import-tree.url = "github:vic/import-tree";
+    flake-aspects.url = "github:vic/flake-aspects";
 
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL/main";
@@ -104,15 +106,10 @@
 
   outputs = inputs @ {flake-parts, ...}:
     flake-parts.lib.mkFlake {inherit inputs;} {
-      # Import all modular parts
+      # Import dendritic modules via import-tree
       imports = [
-        ./parts/lib.nix
-        ./parts/systems.nix
-        ./parts/overlays.nix
-        ./parts/modules.nix
-        ./parts/nixos-configs.nix
-        ./parts/packages.nix
-        ./parts/dev-shell.nix
+        inputs.flake-aspects.flakeModule
+        (inputs.import-tree ./modules)
       ];
     };
 }

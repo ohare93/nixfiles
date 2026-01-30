@@ -12,5 +12,5 @@
 
 ## Package Management
 
-- Custom packages are defined in `home-manager/packages/`
+- Custom packages are defined in `defs/home-manager/packages/`
 - Packages are integrated through the NixOS configuration, not standalone home-manager

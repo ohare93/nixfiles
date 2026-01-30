@@ -10,9 +10,9 @@ This is a NixOS configuration repository with Home Manager integration. It manag
 
 The repository is structured around three main components:
 
-1. **NixOS System Configuration** (`nixos/`): System-level configurations including display, localization, and system services
-2. **Home Manager Configuration** (`home-manager/`): User-level configurations for dotfiles, applications, and personal settings
-3. **Host-specific Configurations** (`hosts/`): Individual machine configurations
+1. **Dendritic Modules** (`modules/`): Flake-parts modules, aspects, and flake outputs
+2. **Module Definitions** (`defs/`): `mynix` option definitions for NixOS/Home Manager plus host asset files
+3. **Host Aspects** (`modules/hosts/`, `modules/hardware/`): Per-host system/service and hardware compositions
 
 Key architectural patterns:
 
@@ -25,7 +25,7 @@ Key architectural patterns:
 
 The links to the necessary tools used in this repository. These should be referenced frequently, especially when making a change in an area of the code featuring these tools. Example uses:
 
-- Installing a package one should reference the Home Manager options, then the NixOS options / packages. GUI apps should generally live in gui.nix and be enabled on the host level, as I don't need gui apps in wsl nix.
+- Installing a package one should reference the Home Manager options, then the NixOS options / packages. GUI apps should generally live in `defs/home-manager/gui-software.nix` and be enabled via host aspects, as I don't need GUI apps in WSL.
 - When adding a new option or package into neovim, the NVF options should be referenced to figure out what are the correct / possible values, and one should always favour nvf implementations over home-manager or nix specific implementations.
 
 ### NixOS

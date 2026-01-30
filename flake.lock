@@ -225,6 +225,21 @@
         "type": "github"
       }
     },
+    "flake-aspects": {
+      "locked": {
+        "lastModified": 1769723924,
+        "narHash": "sha256-U15OaMr9AcJiB1wW2uCFzFO+DnQ3jJSvln+ZR/+Q0vE=",
+        "owner": "vic",
+        "repo": "flake-aspects",
+        "rev": "61524836788ef6991a82e7d34ebb0ccc05d374ed",
+        "type": "github"
+      },
+      "original": {
+        "owner": "vic",
+        "repo": "flake-aspects",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -1070,6 +1085,21 @@
         "type": "github"
       }
     },
+    "import-tree": {
+      "locked": {
+        "lastModified": 1763762820,
+        "narHash": "sha256-ZvYKbFib3AEwiNMLsejb/CWs/OL/srFQ8AogkebEPF0=",
+        "owner": "vic",
+        "repo": "import-tree",
+        "rev": "3c23749d8013ec6daa1d7255057590e9ca726646",
+        "type": "github"
+      },
+      "original": {
+        "owner": "vic",
+        "repo": "import-tree",
+        "type": "github"
+      }
+    },
     "jj": {
       "inputs": {
         "flake-utils": "flake-utils_3",
@@ -1558,12 +1588,14 @@
       "inputs": {
         "agenix": "agenix",
         "disko": "disko",
+        "flake-aspects": "flake-aspects",
         "flake-parts": "flake-parts",
         "home-manager": "home-manager_2",
         "hy3": "hy3",
         "hyprland": "hyprland",
         "hyprmon": "hyprmon",
         "immich-auto-uploader": "immich-auto-uploader",
+        "import-tree": "import-tree",
         "jj": "jj",
         "llm-agents": "llm-agents",
         "neorg-overlay": "neorg-overlay",
