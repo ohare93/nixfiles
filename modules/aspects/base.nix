@@ -78,6 +78,7 @@
         username = "jmo";
         homeDirectory = inputs.private.paths.home;
         stateVersion = "25.05";
+        sessionPath = ["$HOME/.local/bin"];
 
         # Default environment variables
         sessionVariables = {

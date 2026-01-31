@@ -52,6 +52,11 @@ in
               source_if_exists ~/.zshrc_private_keys
               source_if_exists ~/.zshrc_functions
 
+              # Ensure user-local bin is available in non-login shells
+              if [[ -d "$HOME/.local/bin" ]]; then
+                export PATH="$HOME/.local/bin:$PATH"
+              fi
+
               # Initialize carapace if available
               if command -v carapace &> /dev/null; then
                 export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense'

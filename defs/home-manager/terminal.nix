@@ -3,6 +3,7 @@
   config,
   pkgs,
   inputs,
+  hostname,
   ...
 }: let
   cfg = config.mynix.terminal-misc;
@@ -29,6 +30,21 @@ in
     };
 
     config = {
+      home.file.".local/bin/nrb" = {
+        executable = true;
+        text = ''
+          #!/usr/bin/env bash
+          set -euo pipefail
+
+          nix build ~/nixfiles#nixosConfigurations.${hostname}.config.system.build.toplevel -o /tmp/result-new
+          if command -v nvd >/dev/null 2>&1; then
+            nvd diff /run/current-system /tmp/result-new
+          else
+            echo "nvd not found; build complete at /tmp/result-new" >&2
+          fi
+        '';
+      };
+
       home.packages =
         lib.optional cfg.claude.enable pkgs.llm-agents.claude-code
         ++ lib.optional cfg.codex.enable pkgs.llm-agents.codex

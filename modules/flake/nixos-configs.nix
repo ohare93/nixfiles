@@ -6,17 +6,58 @@
 }: let
   inherit (inputs.nixpkgs) lib;
 
-  hasNixosAspect = aspect:
-    lib.hasAttrByPath ["nixos" aspect] self.modules;
+  hasNixosAspectPath = path:
+    lib.hasAttrByPath (["nixos"] ++ path) self.modules;
 
-  hasHomeAspect = aspect:
-    lib.hasAttrByPath ["homeManager" aspect] self.modules;
+  hasHomeAspectPath = path:
+    lib.hasAttrByPath (["homeManager"] ++ path) self.modules;
+
+  hostManifest = import (inputs.self + "/defs/hosts/manifest.nix");
+  hosts = hostManifest.hosts;
+
+  mkNixpkgsConfig = {
+    nixpkgs.config.allowUnfreePredicate = self.lib.allowUnfreePredicate;
+    nixpkgs.config.allowBrokenPredicate = self.lib.allowBrokenPredicate;
+    nixpkgs.overlays = builtins.attrValues self.overlays;
+  };
+
+  mkHomeManager = hostname:
+    let
+      homeKey = "${hostname}.home";
+      homeModule =
+        if hasHomeAspectPath [homeKey]
+        then self.modules.homeManager.${homeKey}
+        else builtins.throw "Missing Home Manager aspect: flake.aspects.\"${homeKey}\"";
+    in {
+      home-manager = {
+        useGlobalPkgs = true;
+        useUserPackages = true;
+        extraSpecialArgs = {
+          inherit inputs hostname private;
+          outputs = self;
+        };
+        sharedModules = [inputs.agenix.homeManagerModules.default];
+        users.jmo = {
+          imports = [
+            self.modules.homeManager.definitions
+            self.modules.homeManager.base
+            homeModule
+          ];
+        };
+      };
+    };
 
   # Helper function to create NixOS systems
   mkSystem = hostname:
     let
-      useHostAspect = hasNixosAspect "host-${hostname}";
-      useHardwareAspect = hasNixosAspect "hardware-${hostname}";
+      hostKey = "${hostname}.host";
+      hardwareKey = "${hostname}.hardware";
+      useHostAspect = hasNixosAspectPath [hostKey];
+      useHardwareAspect = hasNixosAspectPath [hardwareKey];
+      hostModule =
+        if useHostAspect
+        then self.modules.nixos.${hostKey}
+        else builtins.throw "Missing NixOS host aspect: flake.aspects.\"${hostKey}\"";
     in
     lib.nixosSystem {
       system = "x86_64-linux";
@@ -30,41 +71,24 @@
           self.modules.nixos.definitions
           self.modules.nixos.base
         ]
-        ++ lib.optional useHostAspect self.modules.nixos."host-${hostname}"
-        ++ lib.optional useHardwareAspect self.modules.nixos."hardware-${hostname}"
+        ++ [hostModule]
+        ++ lib.optional useHardwareAspect self.modules.nixos.${hardwareKey}
         ++ [
-          ({ ...}: {
-            nixpkgs.config.allowUnfreePredicate = self.lib.allowUnfreePredicate;
-            nixpkgs.config.allowBrokenPredicate = self.lib.allowBrokenPredicate;
-            nixpkgs.overlays = builtins.attrValues self.overlays;
-          })
-
+          ({ ...}: mkNixpkgsConfig)
           inputs.agenix.nixosModules.default
           inputs.home-manager.nixosModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              extraSpecialArgs = {
-                inherit inputs hostname private;
-                outputs = self;
-              };
-              sharedModules = [inputs.agenix.homeManagerModules.default];
-              users.jmo = {
-                imports = [
-                  self.modules.homeManager.definitions
-                  self.modules.homeManager.base
-                  self.modules.homeManager."home-${hostname}"
-                ];
-              };
-            };
-          }
+          (mkHomeManager hostname)
         ];
     };
 
   mkWSL = hostname:
     let
-      useHostAspect = hasNixosAspect "host-${hostname}";
+      hostKey = "${hostname}.host";
+      useHostAspect = hasNixosAspectPath [hostKey];
+      hostModule =
+        if useHostAspect
+        then self.modules.nixos.${hostKey}
+        else builtins.throw "Missing NixOS host aspect: flake.aspects.\"${hostKey}\"";
     in
     lib.nixosSystem {
       system = "x86_64-linux";
@@ -78,13 +102,9 @@
           self.modules.nixos.definitions
           self.modules.nixos.base
         ]
-        ++ lib.optional useHostAspect self.modules.nixos."host-${hostname}"
+        ++ [hostModule]
         ++ [
-          ({ ...}: {
-            nixpkgs.config.allowUnfreePredicate = self.lib.allowUnfreePredicate;
-            nixpkgs.config.allowBrokenPredicate = self.lib.allowBrokenPredicate;
-            nixpkgs.overlays = builtins.attrValues self.overlays;
-          })
+          ({ ...}: mkNixpkgsConfig)
 
           inputs.nixos-wsl.nixosModules.default
           {
@@ -95,32 +115,21 @@
 
           inputs.agenix.nixosModules.default
           inputs.home-manager.nixosModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              extraSpecialArgs = {
-                inherit inputs hostname private;
-                outputs = self;
-              };
-              sharedModules = [inputs.agenix.homeManagerModules.default];
-              users.jmo = {
-                imports = [
-                  self.modules.homeManager.definitions
-                  self.modules.homeManager.base
-                  self.modules.homeManager."home-${hostname}"
-                ];
-              };
-            };
-          }
+          (mkHomeManager hostname)
         ];
     };
 
   # Helper function for Raspberry Pi systems (aarch64-linux)
   mkRPiSystem = hostname:
     let
-      useHostAspect = hasNixosAspect "host-${hostname}";
-      useHardwareAspect = hasNixosAspect "hardware-${hostname}";
+      hostKey = "${hostname}.host";
+      hardwareKey = "${hostname}.hardware";
+      useHostAspect = hasNixosAspectPath [hostKey];
+      useHardwareAspect = hasNixosAspectPath [hardwareKey];
+      hostModule =
+        if useHostAspect
+        then self.modules.nixos.${hostKey}
+        else builtins.throw "Missing NixOS host aspect: flake.aspects.\"${hostKey}\"";
     in
     inputs.nixos-raspberrypi.lib.nixosSystem {
       system = "aarch64-linux";
@@ -133,8 +142,8 @@
         # Host configuration first (includes RPi modules)
         # Host and hardware aspects when available
       ]
-      ++ lib.optional useHostAspect self.modules.nixos."host-${hostname}"
-      ++ lib.optional useHardwareAspect self.modules.nixos."hardware-${hostname}"
+      ++ [hostModule]
+      ++ lib.optional useHardwareAspect self.modules.nixos.${hardwareKey}
       ++ [
 
         # Import essential modules for keyboard and nix features
@@ -206,34 +215,18 @@
         # Home-manager integration for user configurations
         inputs.agenix.nixosModules.default
         inputs.home-manager.nixosModules.home-manager
-        {
-          home-manager = {
-            useGlobalPkgs = true;
-            useUserPackages = true;
-            extraSpecialArgs = {
-              inherit inputs hostname private;
-              outputs = self;
-            };
-            sharedModules = [inputs.agenix.homeManagerModules.default];
-            users.jmo = {
-              imports = [
-                self.modules.homeManager.definitions
-                self.modules.homeManager.base
-                self.modules.homeManager."home-${hostname}"
-              ];
-            };
-          };
-        }
+        (mkHomeManager hostname)
       ];
     };
+
+  mkHost = hostname: host:
+    if host.kind == "rpi" then
+      mkRPiSystem hostname
+    else if host.kind == "wsl" then
+      mkWSL hostname
+    else
+      mkSystem hostname;
 in {
   # NixOS configurations
-  flake.nixosConfigurations = {
-    overton = mkSystem "overton";
-    hatch = mkSystem "hatch";
-    aperture = mkSystem "aperture";
-    loophole = mkWSL "loophole";
-    rectangle = mkRPiSystem "rectangle";
-    skylight = mkSystem "skylight";
-  };
+  flake.nixosConfigurations = lib.mapAttrs mkHost hosts;
 }

@@ -1,6 +1,6 @@
 { inputs, lib, ... }:
 {
-  flake.aspects.hardware-rectangle = {
+  flake.aspects."rectangle.hardware" = {
     nixos = { pkgs, ... }: {
       imports = [
         (inputs.self + "/defs/hosts/rectangle/hardware-configuration.nix")

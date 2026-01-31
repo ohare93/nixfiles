@@ -1,5 +1,5 @@
 {inputs, ...}: {
-  flake.aspects.hardware-overton = {
+  flake.aspects."overton.hardware" = {
     nixos = { ... }: {
       imports = [
         (inputs.self + "/defs/hosts/overton/hardware-configuration.nix")

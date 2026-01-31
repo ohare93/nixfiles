@@ -1,6 +1,6 @@
 { inputs, ... }:
 {
-  flake.aspects.hardware-aperture = {
+  flake.aspects."aperture.hardware" = {
     nixos = { ... }: {
       imports = [
         (inputs.self + "/defs/hosts/aperture/hardware-configuration.nix")

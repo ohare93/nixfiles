@@ -1,6 +1,6 @@
 { inputs, ... }:
 {
-  flake.aspects.hardware-skylight = {
+  flake.aspects."skylight.hardware" = {
     nixos = { ... }: {
       imports = [
         inputs.disko.nixosModules.disko

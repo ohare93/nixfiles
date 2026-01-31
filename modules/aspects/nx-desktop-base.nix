@@ -1,0 +1,59 @@
+{ ... }:
+{
+  flake.aspects.nx-desktop-base = {
+    nixos = { ... }: {
+      # Enable the X11 windowing system.
+      services.xserver.enable = true;
+
+      # Touchpad support
+      services.libinput = {
+        enable = true;
+        touchpad.naturalScrolling = true;
+      };
+
+      # Printing support
+      services.printing.enable = true;
+
+      # Audio with pipewire
+      services.pulseaudio.enable = false;
+      security.rtkit.enable = true;
+      services.pipewire = {
+        enable = true;
+        alsa.enable = true;
+        alsa.support32Bit = true;
+        pulse.enable = true;
+      };
+
+      # Sudo configuration with password exemptions for common NixOS commands
+      security.sudo = {
+        enable = true;
+        wheelNeedsPassword = true;
+        extraRules = [
+          {
+            users = ["jmo"];
+            commands = [
+              {
+                command = "/run/current-system/sw/bin/nixos-rebuild *";
+                options = ["NOPASSWD"];
+              }
+              {
+                command = "/run/current-system/sw/bin/nix-collect-garbage *";
+                options = ["NOPASSWD"];
+              }
+              {
+                command = "/run/current-system/sw/bin/systemctl *";
+                options = ["NOPASSWD"];
+              }
+            ];
+          }
+        ];
+      };
+
+      # GnuPG with SSH support
+      programs.gnupg.agent = {
+        enable = true;
+        enableSSHSupport = true;
+      };
+    };
+  };
+}

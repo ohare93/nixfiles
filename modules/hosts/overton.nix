@@ -1,6 +1,6 @@
 { inputs, self, ... }:
 {
-  flake.aspects.host-overton = {
+  flake.aspects."overton.host" = {
     nixos = { pkgs, config, ... }: {
       imports = [
         self.modules.nixos.nx-podman
@@ -8,6 +8,8 @@
         self.modules.nixos.nx-hyprland-system
         self.modules.nixos.nx-battery-protection
         self.modules.nixos.nx-agentic-coding
+        self.modules.nixos.nx-desktop-base
+        self.modules.nixos.nx-qt-adwaita-dark
         (inputs.self + "/defs/hosts/overton/kanata.nix")
       ];
 
@@ -59,70 +61,9 @@
         ACTION=="change", SUBSYSTEM=="drm", TAG+="systemd", ENV{SYSTEMD_USER_WANTS}="hypr-display-switcher.service"
       '';
 
-      # Enable the X11 windowing system.
-      services.xserver.enable = true;
-      services.libinput = {
-        enable = true;
-        touchpad.naturalScrolling = true;
-      };
-
-      # Enable CUPS to print documents.
-      services.printing.enable = true;
-
-      # Enable sound with pipewire.
-      services.pulseaudio.enable = false;
-      security.rtkit.enable = true;
-      services.pipewire = {
-        enable = true;
-        alsa.enable = true;
-        alsa.support32Bit = true;
-        pulse.enable = true;
-        # If you want to use JACK applications, uncomment this
-        #jack.enable = true;
-
-        # use the example session manager (no others are packaged yet so this is enabled by default,
-        # no need to redefine it in your config for now)
-        #media-session.enable = true;
-      };
-
-      # Sudo configuration with password exemptions for common NixOS commands
-      security.sudo = {
-        enable = true;
-        wheelNeedsPassword = true; # Keep password requirement for general sudo
-        extraRules = [
-          {
-            users = ["jmo"];
-            commands = [
-              {
-                command = "/run/current-system/sw/bin/nixos-rebuild *";
-                options = ["NOPASSWD"];
-              }
-              {
-                command = "/run/current-system/sw/bin/nix-collect-garbage *";
-                options = ["NOPASSWD"];
-              }
-              {
-                command = "/run/current-system/sw/bin/systemctl *";
-                options = ["NOPASSWD"];
-              }
-            ];
-          }
-        ];
-      };
-
       environment.systemPackages = with pkgs; [
         pcsclite
       ];
-
-      qt = {
-        enable = true;
-        platformTheme = "kde";
-        style = "adwaita-dark";
-      };
-
-      # Some programs need SUID wrappers, can be configured further or are
-      # started in user sessions.
-      # programs.mtr.enable = true;
       programs.nix-ld = {
         enable = true;
         libraries = with pkgs; [
@@ -161,10 +102,23 @@
         ];
       };
 
-      programs.gnupg.agent = {
-        enable = true;
-        enableSSHSupport = true;
-      };
+    };
+  };
+
+  flake.aspects."overton.home" = {
+    homeManager = { lib, ... }: {
+      imports = [
+        self.modules.homeManager.hm-desktop-base
+        self.modules.homeManager.hm-desktop-wm
+        self.modules.homeManager.hm-desktop-dev
+        self.modules.homeManager.hm-desktop-ai-full
+        self.modules.homeManager.hm-stmp
+        self.modules.homeManager.hm-bitwarden
+        self.modules.homeManager.hm-typst
+        self.modules.homeManager.hm-self-employed
+      ];
+
+      programs.zellij.enableZshIntegration = lib.mkForce false;
     };
   };
 }

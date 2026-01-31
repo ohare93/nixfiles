@@ -1,6 +1,6 @@
 { inputs, ... }:
 {
-  flake.aspects.hardware-hatch = {
+  flake.aspects."hatch.hardware" = {
     nixos = { ... }: {
       imports = [
         (inputs.self + "/defs/hosts/hatch/hardware-configuration.nix")
