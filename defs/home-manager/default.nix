@@ -35,6 +35,7 @@ in {
     ./bitwarden.nix
     ./typst.nix
     ./self-employed.nix
+    ./gammastep.nix
     inputs.immich-auto-uploader.nixosModules.home-manager
   ];
 
