@@ -155,6 +155,10 @@ in
                 replace = private.identity.personalEmail;
               }
               {
+                trigger = ":sd";
+                replace = private.identity.companyEmail;
+              }
+              {
                 trigger = ":linkedin";
                 replace = private.identity.linkedinUrl;
               }
