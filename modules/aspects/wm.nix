@@ -4,7 +4,7 @@
       mynix = {
         gui-software.enable = true;
         hyprland.enable = true;
-        gammastep.enable = true;
+        hyprsunset.enable = true;
       };
     };
   };
