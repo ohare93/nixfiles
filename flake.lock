@@ -1571,11 +1571,11 @@
     },
     "private": {
       "locked": {
-        "lastModified": 1770041640,
-        "narHash": "sha256-31JMHpo0+IdMj8ANon4C1uHBKTcE6hTmanUQct+WG+0=",
+        "lastModified": 1770134095,
+        "narHash": "sha256-hTV4Ep/UcGq40W9rHpxb2aPlpJr8gFNxLlDGSEm9CrA=",
         "ref": "refs/heads/main",
-        "rev": "ad1ac06ef5b4ffb2f6de3c114ee8d17dedd3ebc7",
-        "revCount": 12,
+        "rev": "24abbaec369bec58267454bfc3c39f781dd62789",
+        "revCount": 13,
         "type": "git",
         "url": "ssh://private-git/jmo/nixfiles.private"
       },

@@ -61,7 +61,7 @@ in
             identityFile = [inputs.private.ssh.identityFiles.cloud];
             identitiesOnly = true;
           };
-        };
+        } // (inputs.private.ssh.matchBlocks or {});
       };
 
       home.activation.addAllSSHKeys = lib.hm.dag.entryAfter ["writeBoundary"] ''
