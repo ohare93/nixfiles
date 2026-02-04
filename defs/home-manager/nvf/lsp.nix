@@ -60,11 +60,11 @@
           enable = true;
           lsp = {
             enable = true;
-            server = "nixd"; # Switched from nil to nixd for better functionality
+            server = ["nixd"];
           };
           format = {
             enable = true;
-            type = "alejandra"; # or "nixpkgs-fmt"
+            type = ["alejandra"];
           };
           extraDiagnostics = {
             enable = true;
@@ -81,7 +81,7 @@
           };
           format = {
             enable = true;
-            type = "stylua";
+            type = ["stylua"];
           };
         };
 
@@ -90,11 +90,11 @@
           enable = true;
           format = {
             enable = true;
-            type = "prettierd";
+            type = ["prettierd"];
           };
           lsp = {
             enable = true;
-            server = "marksman";
+            server = ["marksman"];
           };
         };
 
@@ -107,7 +107,7 @@
           enable = true;
           format = {
             enable = true;
-            type = "prettier";
+            type = ["prettier"];
           };
         };
 
@@ -116,11 +116,11 @@
           enable = true;
           format = {
             enable = true;
-            type = "prettier";
+            type = ["prettier"];
           };
           lsp = {
             enable = true;
-            server = "ts_ls";
+            server = ["ts_ls"];
           };
           extraDiagnostics = {
             enable = true;
@@ -133,11 +133,11 @@
           enable = true;
           format = {
             enable = true;
-            type = "black";
+            type = ["black"];
           };
           lsp = {
             enable = true;
-            server = "pyright";
+            server = ["pyright"];
           };
         };
 
@@ -165,7 +165,7 @@
           # format.enable = true;
           lsp = {
             enable = true;
-            server = "clangd";
+            server = ["clangd"];
           };
         };
 
@@ -174,7 +174,7 @@
           # format.enable = true;
           lsp = {
             enable = true;
-            server = "csharp_ls";
+            server = ["csharp_ls"];
           };
         };
       };
@@ -198,18 +198,9 @@
           ++ lib.optional config.mynix.elm.enable pkgs.vimPlugins.nvim-treesitter.builtGrammars.elm;
 
         # Highlight, indentation, etc.
-        highlight = {
-          enable = true;
-          additionalVimRegexHighlighting = false;
-        };
+        highlight.enable = true;
 
-        incrementalSelection = {
-          enable = true;
-        };
-
-        indent = {
-          enable = true;
-        };
+        indent.enable = true;
       };
 
       # Debugging support (DAP - Debug Adapter Protocol)

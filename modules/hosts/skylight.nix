@@ -48,6 +48,15 @@
         neofetch
       ];
 
+      # Enable nix-ld for running dynamically linked executables (e.g., signal-cli)
+      programs.nix-ld = {
+        enable = true;
+        libraries = with pkgs; [
+          stdenv.cc.cc.lib  # libstdc++
+          zlib              # commonly needed
+        ];
+      };
+
       # Agenix configuration
       age.identityPaths = ["/home/jmo/.ssh/agenix"];
       age.secrets.skylight-signing-key = {

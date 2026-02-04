@@ -13,9 +13,6 @@
       zjstatus = _final: prev: {
         zjstatus = inputs.zjstatus.packages.${prev.stdenv.hostPlatform.system}.default;
       };
-      jujutsu = _final: prev: {
-        jujutsu = inputs.jj.packages.${prev.stdenv.hostPlatform.system}.default;
-      };
       hyprmon = _final: prev: {
         hyprmon = inputs.hyprmon.packages.${prev.stdenv.hostPlatform.system}.default;
       };

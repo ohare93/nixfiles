@@ -6,20 +6,6 @@
   ...
 }: let
   cfg = config.mynix.notes;
-
-  zk-spaced = pkgs.rustPlatform.buildRustPackage rec {
-    pname = "zk-spaced";
-    version = "latest";
-
-    src = pkgs.fetchFromGitHub {
-      owner = "matze";
-      repo = "zk-spaced";
-      rev = "master";
-      hash = "sha256-wJdyHpfg/OOoPUOqUhNWsF4s3WT9EipI+cmGf82/qv4=";
-    };
-
-    cargoLock.lockFile = "${src}/Cargo.lock";
-  };
 in
   with lib; {
     options.mynix.notes = {
@@ -130,7 +116,6 @@ in
       };
 
       home.packages = [
-        zk-spaced
       ];
     };
   }

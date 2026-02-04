@@ -48,18 +48,8 @@
       url = "github:numtide/llm-agents.nix";
     };
 
-    privacy-filter = {
-      url = "github:ohare93/privacy-filter";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     agenix = {
       url = "github:ryantm/agenix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    zjstatus = {
-      url = "github:dj95/zjstatus";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -72,18 +62,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    jj = {
-      url = "github:jj-vcs/jj";
-    };
-
     hyprland = {
       url = "github:hyprwm/Hyprland";
     };
 
-    # Using PR #261 branch for Hyprland 0.52.x compatibility (headers fix)
-    # Once merged, switch back to: url = "github:outfoxxed/hy3";
     hy3 = {
-      url = "github:Immelancholy/hy3/update-to-m_reserved_area";
+      url = "github:outfoxxed/hy3";
       inputs.hyprland.follows = "hyprland";
     };
 

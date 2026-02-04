@@ -161,9 +161,6 @@
         # Fun CLI tools
         cbonsai
         lolcat
-
-        # Privacy tools
-        inputs.privacy-filter.packages.${pkgs.stdenv.hostPlatform.system}.default
       ];
     };
   };
