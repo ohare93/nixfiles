@@ -216,6 +216,16 @@
         inputs.agenix.nixosModules.default
         inputs.home-manager.nixosModules.home-manager
         (mkHomeManager hostname)
+
+        # Agenix secrets for RPi systems (password hash for recovery)
+        ({config, ...}: {
+          age.identityPaths = ["/home/jmo/.ssh/agenix"];
+          age.secrets.jmo-password-hash = {
+            file = inputs.self + "/secrets/jmo-password-hash.age";
+            mode = "400";
+          };
+          users.users.jmo.hashedPasswordFile = config.age.secrets.jmo-password-hash.path;
+        })
       ];
     };
 

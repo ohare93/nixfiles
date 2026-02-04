@@ -24,7 +24,9 @@
         pulse.enable = true;
       };
 
-      # Sudo configuration with password exemptions for common NixOS commands
+      # Sudo configuration - require password for dangerous system commands
+      # NOTE: nixos-rebuild explicitly requires password to prevent accidental
+      # application of wrong configs (e.g., VPS config on desktop)
       security.sudo = {
         enable = true;
         wheelNeedsPassword = true;
@@ -32,10 +34,6 @@
           {
             users = ["jmo"];
             commands = [
-              {
-                command = "/run/current-system/sw/bin/nixos-rebuild *";
-                options = ["NOPASSWD"];
-              }
               {
                 command = "/run/current-system/sw/bin/nix-collect-garbage *";
                 options = ["NOPASSWD"];

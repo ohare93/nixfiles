@@ -5,4 +5,5 @@ in {
   "stmp-password.age".publicKeys = [jmo];
   "skylight-signing-key.age".publicKeys = [jmo];
   "overton-signing-key.age".publicKeys = [jmo];
+  "jmo-password-hash.age".publicKeys = [jmo];
 }

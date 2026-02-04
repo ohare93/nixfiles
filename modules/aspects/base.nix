@@ -2,9 +2,18 @@
   flake.aspects.base = {
     nixos = {
       pkgs,
+      config,
       hostname,
       ...
     }: {
+      # Agenix identity path for decrypting secrets
+      age.identityPaths = ["/home/jmo/.ssh/agenix"];
+
+      # User password stored as agenix secret for declarative recovery
+      age.secrets.jmo-password-hash = {
+        file = inputs.self + "/secrets/jmo-password-hash.age";
+        mode = "400";
+      };
       networking.hostName = hostname;
       networking.networkmanager.enable = true;
 
@@ -61,6 +70,8 @@
         description = inputs.private.identity.fullName;
         extraGroups = ["networkmanager" "wheel" "uinput" "input"];
         shell = pkgs.zsh;
+        # Password hash stored in agenix secret - enables recovery via generation rollback
+        hashedPasswordFile = config.age.secrets.jmo-password-hash.path;
         packages = with pkgs; [];
       };
     };
