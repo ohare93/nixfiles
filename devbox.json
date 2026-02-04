@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.16.0/.schema/devbox.schema.json",
+  "packages": [
+    "nixd",
+    "nil",
+    "alejandra",
+    "statix",
+    "deadnix",
+    "git",
+    "home-manager",
+    "tldr"
+  ],
+  "env": {
+    "AGENIX_IDENTITY": "$HOME/.ssh/agenix"
+  },
+  "shell": {
+    "scripts": {
+      "fmt": ["alejandra", "."],
+      "lint": ["statix", "check"],
+      "deadcode": ["deadnix", "."],
+      "check": ["devbox run fmt && devbox run lint && devbox run deadcode"]
+    }
+  }
+}

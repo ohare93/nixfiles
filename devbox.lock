@@ -1,0 +1,41 @@
+{
+  "lockfile_version": "1",
+  "packages": {
+    "alejandra": {
+      "resolved": "github:NixOS/nixpkgs/6308c3b21396534d8aaeac46179c14c439a89b8a?narHash=sha256-xKPyJoMoXfXpDM5DFDZDsi9PHArf2k5BJjvReYXoFpM%3D#alejandra",
+      "source": "nixpkg"
+    },
+    "deadnix": {
+      "resolved": "github:NixOS/nixpkgs/6308c3b21396534d8aaeac46179c14c439a89b8a?narHash=sha256-xKPyJoMoXfXpDM5DFDZDsi9PHArf2k5BJjvReYXoFpM%3D#deadnix",
+      "source": "nixpkg"
+    },
+    "git": {
+      "resolved": "github:NixOS/nixpkgs/6308c3b21396534d8aaeac46179c14c439a89b8a?narHash=sha256-xKPyJoMoXfXpDM5DFDZDsi9PHArf2k5BJjvReYXoFpM%3D#git",
+      "source": "nixpkg"
+    },
+    "github:NixOS/nixpkgs/nixpkgs-unstable": {
+      "last_modified": "2026-01-30T02:32:49Z",
+      "resolved": "github:NixOS/nixpkgs/6308c3b21396534d8aaeac46179c14c439a89b8a?lastModified=1769740369&narHash=sha256-xKPyJoMoXfXpDM5DFDZDsi9PHArf2k5BJjvReYXoFpM%3D"
+    },
+    "home-manager": {
+      "resolved": "github:NixOS/nixpkgs/6308c3b21396534d8aaeac46179c14c439a89b8a?narHash=sha256-xKPyJoMoXfXpDM5DFDZDsi9PHArf2k5BJjvReYXoFpM%3D#home-manager",
+      "source": "nixpkg"
+    },
+    "nil": {
+      "resolved": "github:NixOS/nixpkgs/6308c3b21396534d8aaeac46179c14c439a89b8a?narHash=sha256-xKPyJoMoXfXpDM5DFDZDsi9PHArf2k5BJjvReYXoFpM%3D#nil",
+      "source": "nixpkg"
+    },
+    "nixd": {
+      "resolved": "github:NixOS/nixpkgs/6308c3b21396534d8aaeac46179c14c439a89b8a?narHash=sha256-xKPyJoMoXfXpDM5DFDZDsi9PHArf2k5BJjvReYXoFpM%3D#nixd",
+      "source": "nixpkg"
+    },
+    "statix": {
+      "resolved": "github:NixOS/nixpkgs/6308c3b21396534d8aaeac46179c14c439a89b8a?narHash=sha256-xKPyJoMoXfXpDM5DFDZDsi9PHArf2k5BJjvReYXoFpM%3D#statix",
+      "source": "nixpkg"
+    },
+    "tldr": {
+      "resolved": "github:NixOS/nixpkgs/6308c3b21396534d8aaeac46179c14c439a89b8a?narHash=sha256-xKPyJoMoXfXpDM5DFDZDsi9PHArf2k5BJjvReYXoFpM%3D#tldr",
+      "source": "nixpkg"
+    }
+  }
+}

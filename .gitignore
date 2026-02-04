@@ -21,3 +21,5 @@ private.nix
 .vscode
 .mcp.json
 
+# Devbox cache
+.devbox/
