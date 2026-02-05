@@ -60,7 +60,7 @@
           enable = true;
           lsp = {
             enable = true;
-            server = ["nixd"];
+            servers = ["nixd"];
           };
           format = {
             enable = true;
@@ -94,7 +94,7 @@
           };
           lsp = {
             enable = true;
-            server = ["marksman"];
+            servers = ["marksman"];
           };
         };
 
@@ -120,7 +120,7 @@
           };
           lsp = {
             enable = true;
-            server = ["ts_ls"];
+            servers = ["ts_ls"];
           };
           extraDiagnostics = {
             enable = true;
@@ -137,14 +137,14 @@
           };
           lsp = {
             enable = true;
-            server = ["pyright"];
+            servers = ["pyright"];
           };
         };
 
         # Rust support (if needed)
         rust = {
           enable = true;
-          crates.enable = false; # Disabled - triggers null_ls deprecation warning
+          extensions.crates-nvim.enable = false; # Disabled - triggers null_ls deprecation warning
           format.enable = true;
           lsp = {
             enable = true;
@@ -165,7 +165,7 @@
           # format.enable = true;
           lsp = {
             enable = true;
-            server = ["clangd"];
+            servers = ["clangd"];
           };
         };
 
@@ -174,7 +174,7 @@
           # format.enable = true;
           lsp = {
             enable = true;
-            server = ["csharp_ls"];
+            servers = ["csharp_ls"];
           };
         };
       };
@@ -268,22 +268,23 @@
 
           # MDX LSP configuration
           mdxLsp = ''
-            -- Custom MDX LSP configuration
-            local lspconfig = require('lspconfig')
+            -- Custom MDX LSP configuration using vim.lsp.config (Neovim 0.11+)
             local capabilities = vim.lsp.protocol.make_client_capabilities()
             capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 
-            lspconfig.mdx_analyzer.setup({
+            vim.lsp.config('mdx_analyzer', {
               capabilities = capabilities,
               cmd = { "${pkgs.mdx-language-server}/bin/mdx-language-server", "--stdio" },
               filetypes = { "mdx" },
-              root_dir = lspconfig.util.root_pattern("package.json", ".git"),
+              root_markers = { "package.json", ".git" },
             })
+            vim.lsp.enable('mdx_analyzer')
           '';
 
           # JSON LSP configuration
           jsonLsp = ''
-            require('lspconfig').jsonls.setup({
+            -- Custom JSON LSP configuration using vim.lsp.config (Neovim 0.11+)
+            vim.lsp.config('jsonls', {
               cmd = { "${pkgs.vscode-langservers-extracted}/bin/vscode-json-language-server", "--stdio" },
               filetypes = { "json", "jsonc" },
               settings = {
@@ -292,23 +293,19 @@
                 },
               },
             })
+            vim.lsp.enable('jsonls')
           '';
         }
         // lib.optionalAttrs config.mynix.elm.enable {
           # Custom Elm LSP configuration
           elmLsp = ''
-            -- Custom Elm LSP configuration
-            local lspconfig = require('lspconfig')
-
-            -- Get capabilities from nvf's LSP configuration
+            -- Custom Elm LSP configuration using vim.lsp.config (Neovim 0.11+)
             local capabilities = vim.lsp.protocol.make_client_capabilities()
             capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 
-            lspconfig.elmls.setup({
+            vim.lsp.config('elmls', {
               capabilities = capabilities,
-              -- Root directory detection for elm.json
-              root_dir = lspconfig.util.root_pattern("elm.json"),
-              -- Let nvf handle the keymaps through LspAttach autocmd
+              root_markers = { "elm.json" },
               settings = {
                 elmLS = {
                   elmPath = "${pkgs.elmPackages.elm}/bin/elm",
@@ -317,6 +314,7 @@
                 }
               }
             })
+            vim.lsp.enable('elmls')
           '';
         };
     };

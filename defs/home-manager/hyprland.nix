@@ -497,7 +497,7 @@ in
         mako
 
         # File manager
-        xfce.thunar
+        thunar
         ffmpegthumbnailer # Video thumbnail support for Thunar
 
         # Network management
