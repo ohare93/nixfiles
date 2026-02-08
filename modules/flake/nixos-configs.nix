@@ -219,7 +219,7 @@
 
         # Agenix secrets for RPi systems (password hash for recovery)
         ({config, ...}: {
-          age.identityPaths = ["/home/jmo/.ssh/agenix"];
+          age.identityPaths = ["/home/jmo/.ssh/age_${hostname}"];
           age.secrets.jmo-password-hash = {
             file = inputs.self + "/secrets/jmo-password-hash.age";
             mode = "400";

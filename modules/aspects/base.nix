@@ -7,7 +7,7 @@
       ...
     }: {
       # Agenix identity path for decrypting secrets
-      age.identityPaths = ["/home/jmo/.ssh/agenix"];
+      age.identityPaths = ["/home/jmo/.ssh/age_${hostname}"];
 
       # User password stored as agenix secret for declarative recovery
       age.secrets.jmo-password-hash = {

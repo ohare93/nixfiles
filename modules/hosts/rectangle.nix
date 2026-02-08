@@ -74,6 +74,14 @@
         };
       };
 
+      mynix.ssh.ca = {
+        enable = true;
+        publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBAGMME41mVJTB8zrubSIJcsYV2KGXc9FHguwULRd4f1 jmo-ssh-user-ca";
+        authorizedPrincipalsFile = "/etc/ssh/auth_principals/%u";
+      };
+
+      environment.etc."ssh/auth_principals/jmo".text = "jmo\n";
+
       # Enable XRDP for remote desktop access via Remmina
       services.xrdp = {
         enable = true;

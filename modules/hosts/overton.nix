@@ -1,7 +1,7 @@
 { inputs, self, ... }:
 {
   flake.aspects."overton.host" = {
-    nixos = { pkgs, config, ... }: {
+    nixos = { pkgs, config, hostname, ... }: {
       imports = [
         self.modules.nixos.nx-podman
         self.modules.nixos.nx-displaylink
@@ -28,7 +28,7 @@
       };
 
       # Agenix configuration
-      age.identityPaths = ["/home/jmo/.ssh/agenix"];
+      age.identityPaths = ["/home/jmo/.ssh/age_${hostname}"];
       age.secrets.overton-signing-key = {
         file = inputs.self + "/secrets/overton-signing-key.age";
         mode = "400";

@@ -3,6 +3,7 @@
   config,
   pkgs,
   inputs,
+  hostname,
   ...
 }: let
   cfg = config.mynix.gui-software;
@@ -42,7 +43,7 @@ in
       };
 
       # Configure agenix to use our SSH key
-      age.identityPaths = ["${config.home.homeDirectory}/.ssh/agenix"];
+      age.identityPaths = ["${config.home.homeDirectory}/.ssh/age_${hostname}"];
 
       # Define the ntfy token secret
       age.secrets.ntfy-token = {

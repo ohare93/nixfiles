@@ -1,7 +1,7 @@
 { inputs, lib, pkgs, config, self, ... }:
 {
   flake.aspects."skylight.host" = {
-    nixos = { ... }: {
+    nixos = { lib, pkgs, config, hostname, ... }: {
       system.stateVersion = "25.05";
 
       # Binary cache for nixos-raspberrypi
@@ -58,7 +58,7 @@
       };
 
       # Agenix configuration
-      age.identityPaths = ["/home/jmo/.ssh/agenix"];
+      age.identityPaths = ["/home/jmo/.ssh/age_${hostname}"];
       age.secrets.skylight-signing-key = {
         file = inputs.self + "/secrets/skylight-signing-key.age";
         mode = "400";
@@ -73,7 +73,15 @@
           enableSigning = true;
           signingKeyFile = config.age.secrets.skylight-signing-key.path;
         };
+
+        ssh.ca = {
+          enable = true;
+          publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBAGMME41mVJTB8zrubSIJcsYV2KGXc9FHguwULRd4f1 jmo-ssh-user-ca";
+          authorizedPrincipalsFile = "/etc/ssh/auth_principals/%u";
+        };
       };
+
+      environment.etc."ssh/auth_principals/jmo".text = "jmo\n";
     };
   };
 
