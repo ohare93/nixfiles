@@ -21,6 +21,10 @@ in
 
     config = {
       home.file.".zshrc_functions".source = ./scripts/zsh_extras;
+      home.file.".local/bin/ssh-cert-sign" = {
+        source = ./scripts/ssh-cert-sign;
+        executable = true;
+      };
 
       programs = {
         zsh = mkIf cfg.enable {

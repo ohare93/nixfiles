@@ -39,6 +39,99 @@ nvd diff /run/current-system ./result-new
 sudo nix-collect-garbage -d
 ```
 
+## SSH Keys and CA
+
+### Naming conventions
+
+- Host keys: `~/.ssh/host_<hostname>`
+- Service keys: `~/.ssh/svc_<service>`
+- Agenix keys: `~/.ssh/age_<hostname>`
+
+### User CA
+
+CA private key lives on Overton:
+
+```bash
+ssh-keygen -t ed25519 -f "$HOME/.ssh/ca/ssh_user_ca" -C "jmo-ssh-user-ca"
+```
+
+Sign a device key for 30 days:
+
+```bash
+ssh-keygen -s "$HOME/.ssh/ca/ssh_user_ca" \
+  -I "<host>-$(date +%Y%m%d)" \
+  -n "jmo" \
+  -V +30d \
+  "$HOME/.ssh/host_<hostname>.pub"
+```
+
+This writes `~/.ssh/host_<hostname>-cert.pub` alongside the public key and OpenSSH will pick it up automatically.
+
+### Server trust (NixOS)
+
+Set CA trust on servers you control:
+
+```nix
+mynix.ssh.ca = {
+  enable = true;
+  publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBAGMME41mVJTB8zrubSIJcsYV2KGXc9FHguwULRd4f1 jmo-ssh-user-ca";
+  authorizedPrincipalsFile = "/etc/ssh/auth_principals/%u";
+};
+
+environment.etc."ssh/auth_principals/jmo".text = "jmo\n";
+```
+
+### KRL revoke (optional)
+
+Sign with a serial for revoke support:
+
+```bash
+ssh-keygen -s "$HOME/.ssh/ca/ssh_user_ca" \
+  -I "<host>-$(date +%Y%m%d)" \
+  -n "jmo" \
+  -V +30d \
+  -z <serial> \
+  "$HOME/.ssh/host_<hostname>.pub"
+```
+
+Revoke by serial (generate/update KRL):
+
+```bash
+ssh-keygen -k -f "$HOME/.ssh/ca/revoked.krl" -s "$HOME/.ssh/ca/ssh_user_ca" -z <serial>
+```
+
+On servers, set:
+
+```
+services.openssh.settings.RevokedKeys = "/etc/ssh/revoked.krl";
+```
+
+### Renewal script (example)
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+CA_KEY="$HOME/.ssh/ca/ssh_user_ca"
+PRINCIPALS="jmo"
+DAYS=30
+
+sign_key() {
+  local pubkey="$1"
+  local name="$2"
+  local serial="$3"
+
+  ssh-keygen -s "$CA_KEY" \
+    -I "${name}-$(date +%Y%m%d)" \
+    -n "$PRINCIPALS" \
+    -V "+${DAYS}d" \
+    -z "$serial" \
+    "$pubkey"
+}
+
+sign_key "$HOME/.ssh/host_overton.pub" "overton" 1
+```
+
 ## Battery Management
 
 ### Status and Diagnostics

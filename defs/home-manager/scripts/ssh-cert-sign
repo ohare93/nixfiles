@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: ssh-cert-sign --host <hostname> [options]
+
+Options:
+  --host <hostname>        Hostname used for key naming
+  --pubkey <path>          Public key to sign (default: ~/.ssh/host_<hostname>.pub)
+  --principals <list>      Principals (default: jmo)
+  --days <n>               Validity in days (default: 30)
+  --serial <n>             Serial number (default: epoch seconds)
+  --ca-key <path>          CA private key (default: ~/.ssh/ca/ssh_user_ca)
+  -h, --help               Show this help
+
+Examples:
+  ssh-cert-sign --host overton
+  ssh-cert-sign --host skylight --principals "jmo,admin" --days 60
+  ssh-cert-sign --host skylight --serial 42
+EOF
+}
+
+CA_KEY="$HOME/.ssh/ca/ssh_user_ca"
+PRINCIPALS="jmo"
+DAYS=30
+HOST=""
+PUBKEY=""
+SERIAL=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --host)
+      HOST="$2"
+      shift 2
+      ;;
+    --pubkey)
+      PUBKEY="$2"
+      shift 2
+      ;;
+    --principals)
+      PRINCIPALS="$2"
+      shift 2
+      ;;
+    --days)
+      DAYS="$2"
+      shift 2
+      ;;
+    --serial)
+      SERIAL="$2"
+      shift 2
+      ;;
+    --ca-key)
+      CA_KEY="$2"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1" >&2
+      usage
+      exit 1
+      ;;
+  esac
+done
+
+if [[ -z "$HOST" ]]; then
+  echo "--host is required" >&2
+  usage
+  exit 1
+fi
+
+if [[ -z "$PUBKEY" ]]; then
+  PUBKEY="$HOME/.ssh/host_${HOST}.pub"
+fi
+
+if [[ -z "$SERIAL" ]]; then
+  SERIAL="$(date +%s)"
+fi
+
+if [[ ! -f "$CA_KEY" ]]; then
+  echo "CA key not found: $CA_KEY" >&2
+  exit 1
+fi
+
+if [[ ! -f "$PUBKEY" ]]; then
+  echo "Public key not found: $PUBKEY" >&2
+  exit 1
+fi
+
+ssh-keygen -s "$CA_KEY" \
+  -I "${HOST}-$(date +%Y%m%d)" \
+  -n "$PRINCIPALS" \
+  -V "+${DAYS}d" \
+  -z "$SERIAL" \
+  "$PUBKEY"
+
+echo "Signed: ${PUBKEY%.pub}-cert.pub"
+echo "Serial: $SERIAL"

@@ -9,18 +9,19 @@
   cfg = config.mynix.ssh;
   serviceKeyNames = ["gitea" "unraid" "github" "githubDc" "cloud"];
   defaultServiceKeyPaths = {
-    gitea = "$HOME/.ssh/svc_gitea";
-    unraid = "$HOME/.ssh/svc_unraid";
-    github = "$HOME/.ssh/svc_github";
-    githubDc = "$HOME/.ssh/svc_github_dc";
-    cloud = "$HOME/.ssh/svc_cloud";
+    gitea = "~/.ssh/svc_gitea";
+    unraid = "~/.ssh/svc_unraid";
+    github = "~/.ssh/svc_github";
+    githubDc = "~/.ssh/svc_github_dc";
+    cloud = "~/.ssh/svc_cloud";
   };
   serviceKeyPaths = cfg.keyPaths.services;
+  expandHome = path: lib.replaceStrings ["~/"] ["$HOME/"] path;
   keysToAdd =
     [cfg.keyPaths.host]
     ++ map (name: serviceKeyPaths.${name}) serviceKeyNames
     ++ cfg.extraAgentKeys;
-  addKeyLines = lib.concatMapStringsSep "\n" (key: ''add_key ${lib.escapeShellArg key}'') keysToAdd;
+  addKeyLines = lib.concatMapStringsSep "\n" (key: ''add_key ${lib.escapeShellArg (expandHome key)}'') keysToAdd;
 in
   with lib; {
     options.mynix = {
@@ -29,7 +30,7 @@ in
         keyPaths = {
           host = mkOption {
             type = types.str;
-            default = "$HOME/.ssh/host_${hostname}";
+            default = "~/.ssh/host_${hostname}";
             description = "Preferred host key name for this machine.";
           };
           services = mkOption {
@@ -39,7 +40,7 @@ in
           };
           age = mkOption {
             type = types.str;
-            default = "$HOME/.ssh/age_${hostname}";
+            default = "~/.ssh/age_${hostname}";
             description = "Preferred agenix key name for this machine.";
           };
         };
