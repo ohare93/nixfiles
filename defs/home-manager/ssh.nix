@@ -59,6 +59,28 @@ in
         SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/ssh-agent";
       };
 
+      home.file.".local/bin/agenix" = {
+        text = ''
+          #!/usr/bin/env bash
+          set -euo pipefail
+
+          real_agenix="${pkgs.agenix}/bin/agenix"
+          default_key="${cfg.keyPaths.age}"
+          key_path="''${AGENIX_IDENTITY:-$default_key}"
+
+          for arg in "$@"; do
+            case "$arg" in
+              -i|--identity|--identity=*)
+                exec "$real_agenix" "$@"
+                ;;
+            esac
+          done
+
+          exec "$real_agenix" -i "$key_path" "$@"
+        '';
+        executable = true;
+      };
+
       home.packages = with pkgs; [
         cloudflared
       ];

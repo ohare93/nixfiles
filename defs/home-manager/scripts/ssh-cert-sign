@@ -16,8 +16,8 @@ Options:
 
 Examples:
   ssh-cert-sign --host overton
-  ssh-cert-sign --host skylight --principals "jmo,admin" --days 60
-  ssh-cert-sign --host skylight --serial 42
+  ssh-cert-sign --host example --principals "jmo,admin" --days 60
+  ssh-cert-sign --host example --serial 42
 EOF
 }
 

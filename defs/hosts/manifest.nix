@@ -5,6 +5,5 @@
     loophole = { kind = "wsl"; };
     overton = { kind = "system"; };
     rectangle = { kind = "rpi"; };
-    skylight = { kind = "system"; };
   };
 }

@@ -47,6 +47,22 @@ sudo nix-collect-garbage -d
 - Service keys: `~/.ssh/svc_<service>`
 - Agenix keys: `~/.ssh/age_<hostname>`
 
+### Agenix CLI default identity
+
+The `agenix` wrapper defaults to `~/.ssh/age_<hostname>` if `-i/--identity` is not provided.
+
+Override per-command:
+
+```bash
+agenix -i ~/.ssh/age_overton -e secrets/example.age
+```
+
+Override via env:
+
+```bash
+AGENIX_IDENTITY=~/.ssh/age_overton agenix -e secrets/example.age
+```
+
 ### User CA
 
 CA private key lives on Overton:
