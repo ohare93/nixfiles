@@ -16,7 +16,7 @@
     cloud = "~/.ssh/svc_cloud";
   };
   serviceKeyPaths = cfg.keyPaths.services;
-  expandHome = path: lib.replaceStrings ["~/"] ["$HOME/"] path;
+  expandHome = path: lib.replaceStrings ["~/"] ["${config.home.homeDirectory}/"] path;
   keysToAdd =
     [cfg.keyPaths.host]
     ++ map (name: serviceKeyPaths.${name}) serviceKeyNames
@@ -74,14 +74,7 @@ in
               identityFile = cfg.keyPaths.host;
             };
 
-            "gitea" = {
-              hostname = inputs.private.services.gitea.domain;
-              user = "git";
-              inherit (inputs.private.services.gitea) port;
-              identityFile = [serviceKeyPaths.gitea];
-              identitiesOnly = true;
-            };
-            "private-git" = {
+            "gitea private-git ${inputs.private.services.gitea.domain} ${inputs.private.selfhost.sites.personalMain}" = {
               hostname = inputs.private.services.gitea.domain;
               user = "git";
               inherit (inputs.private.services.gitea) port;
@@ -94,7 +87,7 @@ in
               identityFile = [serviceKeyPaths.unraid];
               identitiesOnly = true;
             };
-            "github-ohare" = {
+            "github.com github-ohare" = {
               hostname = "github.com";
               identityFile = [serviceKeyPaths.github];
               identitiesOnly = true;
