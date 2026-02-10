@@ -97,6 +97,12 @@ mynix.ssh.ca = {
 environment.etc."ssh/auth_principals/jmo".text = "jmo\n";
 ```
 
+Important: `AuthorizedPrincipalsFile` must resolve outside `/nix/store`. OpenSSH
+refuses principals files that resolve into `/nix/store` and logs
+`bad ownership or modes for directory /nix/store`, which breaks CA auth even
+when the CA/principal are correct. Keep `/etc/ssh/auth_principals/<user>` as a
+real file (not a symlink into the store).
+
 ### KRL revoke (optional)
 
 Sign with a serial for revoke support:

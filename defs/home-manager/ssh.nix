@@ -64,7 +64,7 @@ in
           #!/usr/bin/env bash
           set -euo pipefail
 
-          real_agenix="${pkgs.agenix}/bin/agenix"
+          real_agenix="${inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.default}/bin/agenix"
           default_key="${cfg.keyPaths.age}"
           key_path="''${AGENIX_IDENTITY:-$default_key}"
 
