@@ -107,6 +107,9 @@ in
             # Compact density
             "browser.uidensity" = 1;
 
+            # Ctrl+Tab cycles recent tabs
+            "browser.ctrlTab.sortByRecentlyUsed" = true;
+
             # Wayland support
             "widget.use-xdg-desktop-portal.file-picker" = 1;
 
@@ -183,8 +186,12 @@ in
         bind d tabclose
         bind u undo
 
-        " Open new tab
-        bind t fillcmdline tabopen
+        " Open new tab as child of current tab (Tree Style Tab aware)
+        " Uses openerTabId which TST automatically recognizes as parent-child
+        bind t jsb browser.tabs.query({active: true, currentWindow: true}).then(tabs => browser.tabs.create({openerTabId: tabs[0].id}))
+
+        " Open new tab as sibling (same parent as current tab)
+        bind T jsb browser.tabs.query({active: true, currentWindow: true}).then(tabs => browser.runtime.sendMessage("treestyletab@piro.sakura.ne.jp", {type: "get-tree", tab: tabs[0].id}).then(tree => browser.tabs.create(tree && tree.ancestorTabIds && tree.ancestorTabIds.length > 0 ? {openerTabId: tree.ancestorTabIds[0]} : {})).catch(() => browser.tabs.create({})))
 
         " Yank current URL
         bind yy clipboard yank
@@ -234,8 +241,6 @@ in
         unbind <C-f>
 
         " Tree Style Tab integration
-        " T - open new tab as child of current tab
-        bind T composite tabopen -b | tstattach %
 
         " Tree navigation - indent/outdent
         bind > js browser.runtime.sendMessage("treestyletab@piro.sakura.ne.jp", {type: "indent", tab: "current"})
