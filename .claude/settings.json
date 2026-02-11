@@ -4,6 +4,18 @@
     "enabled": true,
     "autoAllowBashIfSandboxed": true,
     "allowUnsandboxedCommands": true,
+    "excludedCommands": [
+      "nix",
+      "nix-build",
+      "nix-shell",
+      "nix-instantiate",
+      "nix-store",
+      "nix-env",
+      "nix-channel",
+      "nix-collect-garbage",
+      "nixos-rebuild",
+      "nh"
+    ],
     "network": {
       "allowUnixSockets": ["/run/user/1000/gnupg/S.gpg-agent.ssh"]
     }
