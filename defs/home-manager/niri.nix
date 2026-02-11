@@ -408,16 +408,20 @@ in
 
           BUILTIN_DISPLAY="eDP-1"
 
-          # Count number of outputs using niri msg
-          # niri msg outputs lists all outputs, we count those that are connected
-          num_of_monitors=$(niri msg outputs 2>/dev/null | grep -c "output")
+          # Small delay to let niri detect the display change
+          sleep 1
 
-          if [[ $num_of_monitors -gt 1 ]]; then
-            # Multiple monitors detected: disable laptop screen
+          # Count connected outputs (excluding the laptop screen itself when checking)
+          # niri msg outputs returns JSON-like output with "Output" entries
+          external_monitors=$(niri msg outputs 2>/dev/null | grep -c "Output" || echo 0)
+
+          # If we have more than 1 output total (laptop + external), external is connected
+          if [[ $external_monitors -gt 1 ]]; then
+            # External monitor detected: disable laptop screen
             niri msg output "$BUILTIN_DISPLAY" off 2>/dev/null
             notify-send "Display Hotplug" "Laptop screen disabled - using external monitor"
           else
-            # Single monitor: enable laptop screen
+            # No external monitor: enable laptop screen
             niri msg output "$BUILTIN_DISPLAY" on 2>/dev/null
             notify-send "Display Hotplug" "Laptop screen enabled"
           fi

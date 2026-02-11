@@ -22,6 +22,29 @@ in
       # Enable Niri scrollable tiling window manager
       programs.niri.enable = true;
 
+      # Udev rule to trigger display switcher on monitor hotplug
+      # Uses a script to find graphical sessions and trigger the user service
+      services.udev.extraRules = let
+        hotplugHelper = pkgs.writeShellScript "niri-hotplug-helper" ''
+          # Find all graphical sessions and trigger the display switcher for each
+          for session in $(${pkgs.systemd}/bin/loginctl list-sessions --no-legend | ${pkgs.gawk}/bin/awk '{print $1}'); do
+            session_type=$(${pkgs.systemd}/bin/loginctl show-session "$session" -p Type --value 2>/dev/null)
+            if [ "$session_type" = "wayland" ] || [ "$session_type" = "x11" ]; then
+              user=$(${pkgs.systemd}/bin/loginctl show-session "$session" -p Name --value 2>/dev/null)
+              uid=$(${pkgs.coreutils}/bin/id -u "$user" 2>/dev/null)
+              if [ -n "$uid" ]; then
+                DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
+                XDG_RUNTIME_DIR="/run/user/$uid" \
+                ${pkgs.systemd}/bin/systemctl --user -M "$user@" start --no-block niri-display-switcher.service 2>/dev/null || true
+              fi
+            fi
+          done
+        '';
+      in ''
+        ACTION=="change", SUBSYSTEM=="drm", RUN+="${hotplugHelper}"
+      '';
+
+
       # Use unstable niri for DisplayLink support (added in 25.11)
       programs.niri.package = pkgs.niri-unstable;
 
