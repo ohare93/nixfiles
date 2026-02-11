@@ -7,4 +7,7 @@
 
   # Neorg overlay for proper plugin and grammar support
   neorg = inputs.neorg-overlay.overlays.default;
+
+  # Niri overlay for niri-unstable package (DisplayLink support)
+  niri = inputs.niri.overlays.niri;
 }

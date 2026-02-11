@@ -15,6 +15,7 @@ in {
     ./qutebrowser.nix
     ./firefox.nix
     ./hyprland.nix
+    ./niri.nix
     ./i3.nix
     ./zsh.nix
     ./terminal.nix

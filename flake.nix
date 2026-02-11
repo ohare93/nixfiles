@@ -76,6 +76,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    niri = {
+      url = "github:sodiboo/niri-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Nix User Repository (for Firefox addons like Tridactyl)
     nur = {
       url = "github:nix-community/NUR";

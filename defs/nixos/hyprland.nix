@@ -20,10 +20,10 @@ in
         xwayland.enable = true;
       };
 
-      # Display manager configuration
+      # Display manager configuration (use mkDefault to allow sharing with other WMs)
       services.displayManager.sddm = {
-        enable = true;
-        wayland.enable = true;
+        enable = mkDefault true;
+        wayland.enable = mkDefault true;
       };
 
       # Enable gnome-keyring for password storage

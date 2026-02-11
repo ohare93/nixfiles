@@ -9,6 +9,7 @@
     ./hardware-monitoring.nix
     ./networking.nix
     ./hyprland.nix
+    ./niri.nix
     ./battery-protection.nix
     ./agentic-coding.nix
     ./uinput.nix

@@ -6,6 +6,7 @@
         self.modules.nixos.nx-podman
         self.modules.nixos.nx-displaylink
         self.modules.nixos.nx-hyprland-system
+        self.modules.nixos.nx-niri-system
         self.modules.nixos.nx-battery-protection
         self.modules.nixos.nx-agentic-coding
         self.modules.nixos.nx-desktop-base
@@ -110,6 +111,7 @@
       imports = [
         self.modules.homeManager.hm-desktop-base
         self.modules.homeManager.hm-desktop-wm
+        self.modules.homeManager.niri-wm
         self.modules.homeManager.hm-desktop-dev
         self.modules.homeManager.hm-desktop-ai-full
         self.modules.homeManager.hm-stmp
