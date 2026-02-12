@@ -25,6 +25,7 @@ in {
     ./notes.nix
     ./elm.nix
     ./espanso.nix
+    ./agentic-dev.nix
     ./devbox.nix
     ./immich.nix
     ./television.nix

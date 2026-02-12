@@ -64,4 +64,4 @@ nix flake update
 
 ```
 
-**Important**: This configuration uses Home Manager as a NixOS module. Both system and user packages are updated together with `nixos-rebuild`. There is no separate `home-manager switch` command.
+**Important**: This configuration uses Home Manager as a NixOS module. Use `nh os build --no-nom` for builds and avoid `nixos-rebuild` commands. There is no separate `home-manager switch` command.

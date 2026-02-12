@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DEV_ROOT="${DEV_ROOT:-/home/jmo/Development}"
+CACHE_ROOT="${DEV_ROOT}/_ops/caches"
+DAYS="${DAYS:-30}"
+
+if [ ! -d "$CACHE_ROOT" ]; then
+  exit 0
+fi
+
+find "$CACHE_ROOT" -type f -name .last_used -mtime +"$DAYS" -print0 |
+  while IFS= read -r -d '' marker; do
+    dir="$(dirname "$marker")"
+    rm -rf -- "$dir"
+  done
