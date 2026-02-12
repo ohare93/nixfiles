@@ -58,7 +58,7 @@
 ; System Monitors Widget
 ; ============================================================================
 
-(defwidget circular-progress [value label tooltip ?critical]
+(defwidget circular-meter [value label tooltip ?critical]
   (box
     :class "circular-monitor"
     :tooltip tooltip
@@ -76,17 +76,17 @@
     :orientation "v"
     :space-evenly false
     :spacing 8
-    (circular-progress
+    (circular-meter
       :value {system-stats.cpu}
       :label ""
       :tooltip "CPU: ${system-stats.cpu}%"
       :critical {system-stats.cpu > 80})
-    (circular-progress
+    (circular-meter
       :value {system-stats.mem}
       :label ""
       :tooltip "RAM: ${system-stats.mem}%"
       :critical {system-stats.mem > 80})
-    (circular-progress
+    (circular-meter
       :value {system-stats.temp}
       :label ""
       :tooltip "Temp: ${system-stats.temp}C"
