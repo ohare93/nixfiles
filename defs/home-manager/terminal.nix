@@ -58,6 +58,7 @@ in
       xdg.configFile = mkMerge [
         (mkIf cfg.zellij.enable {
           "zellij/config.kdl".source = ./config/zellij.kdl;
+          "zellij/layouts/minimal.kdl".source = ./config/zellij-minimal.kdl;
           # TEMPORARILY DISABLED to test if zjstatus causes flickering/glitching
           # "zellij/zjstatus.kdl".source = ./config/zjstatus.kdl;
           # "zellij/check-alerts.sh" = {

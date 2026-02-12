@@ -71,6 +71,9 @@ with lib; {
         allow_remote_control = "socket-only";
         listen_on = "unix:/tmp/kitty";
         shell_integration = "enabled";
+      }
+      // optionalAttrs (config.mynix.terminal-misc.zellij.enable or false) {
+        shell = "zellij --layout minimal";
       };
 
       # Keybindings (keyboard-centric)
