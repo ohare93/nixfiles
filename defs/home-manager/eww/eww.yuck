@@ -8,13 +8,13 @@
 ; Workspace state from niri daemon (real-time via deflisten)
 (deflisten niri-state
   :initial '{"workspaces":[],"focused_workspace":null,"focused_window":null}'
-  "~/.local/bin/niri-eww-daemon")
+  "$HOME/.local/bin/niri-eww-daemon")
 
 ; System stats (polled every 2 seconds)
 (defpoll system-stats
   :interval "2s"
   :initial '{"cpu":0,"mem":0,"temp":0,"disk":0,"volume":50,"muted":false,"battery":100,"battery_status":"Unknown","wifi_enabled":false,"wifi_ssid":"","bluetooth":false,"nightlight":false,"caffeine":false}'
-  "~/.local/bin/eww-system-stats")
+  "$HOME/.local/bin/eww-system-stats")
 
 ; Clock (polled every second)
 (defpoll time-hour :interval "1s" "date '+%H'")

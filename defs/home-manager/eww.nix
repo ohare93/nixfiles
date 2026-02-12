@@ -142,25 +142,27 @@ in
                           win_list = json.loads(result.stdout)
                           for win in win_list:
                               win_id = win.get("id")
-                              ws_idx = win.get("workspace_id")
+                              ws_id = win.get("workspace_id")  # This is workspace id, not idx
                               app_id = win.get("app_id", "")
                               self.windows[win_id] = {
                                   "id": win_id,
                                   "app_id": app_id,
                                   "title": win.get("title", ""),
-                                  "workspace_id": ws_idx,
+                                  "workspace_id": ws_id,
                                   "is_focused": win.get("is_focused", False),
                                   "icon": get_icon(app_id)
                               }
                               if win.get("is_focused"):
                                   self.focused_window = win_id
-                              # Add to workspace windows
-                              if ws_idx in self.workspaces:
-                                  self.workspaces[ws_idx]["windows"].append({
-                                      "id": win_id,
-                                      "app_id": app_id,
-                                      "icon": get_icon(app_id)
-                                  })
+                              # Add to workspace windows (find by id, not idx)
+                              for workspace in self.workspaces.values():
+                                  if workspace["id"] == ws_id:
+                                      workspace["windows"].append({
+                                          "id": win_id,
+                                          "app_id": app_id,
+                                          "icon": get_icon(app_id)
+                                      })
+                                      break
                   except Exception as e:
                       print(f"Init error: {e}", file=sys.stderr)
 
