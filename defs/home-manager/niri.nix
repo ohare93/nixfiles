@@ -95,8 +95,8 @@ in
           };
 
           # Spawn at startup
+          # Note: waybar removed - using eww sidebar instead (via systemd)
           spawn-at-startup = [
-            { command = ["waybar"]; }
             { command = ["nm-applet" "--indicator"]; }
             { command = ["blueman-applet"]; }
             { command = ["/run/current-system/sw/libexec/polkit-gnome-authentication-agent-1"]; }

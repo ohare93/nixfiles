@@ -1,0 +1,226 @@
+; eww sidebar for niri
+; Vertical bar on the left side
+
+; ============================================================================
+; Variables
+; ============================================================================
+
+; Workspace state from niri daemon (real-time via deflisten)
+(deflisten niri-state
+  :initial '{"workspaces":[],"focused_workspace":null,"focused_window":null}'
+  "~/.local/bin/niri-eww-daemon")
+
+; System stats (polled every 2 seconds)
+(defpoll system-stats
+  :interval "2s"
+  :initial '{"cpu":0,"mem":0,"temp":0,"disk":0,"volume":50,"muted":false,"battery":100,"battery_status":"Unknown","wifi_enabled":false,"wifi_ssid":"","bluetooth":false,"nightlight":false,"caffeine":false}'
+  "~/.local/bin/eww-system-stats")
+
+; Clock (polled every second)
+(defpoll time-hour :interval "1s" "date '+%H'")
+(defpoll time-min :interval "1s" "date '+%M'")
+(defpoll date-day :interval "60s" "date '+%a'")
+(defpoll date-num :interval "60s" "date '+%d'")
+
+; ============================================================================
+; Workspace Widget
+; ============================================================================
+
+(defwidget workspaces []
+  (box
+    :class "workspaces"
+    :orientation "v"
+    :space-evenly false
+    :spacing 4
+    (for ws in {niri-state.workspaces}
+      (button
+        :class "workspace ${ws.is_focused ? 'focused' : ''} ${arraylength(ws.windows) > 0 ? 'occupied' : ''}"
+        :onclick "niri msg action focus-workspace ${ws.idx}"
+        :tooltip "Workspace ${ws.idx}"
+        (box
+          :orientation "v"
+          :space-evenly false
+          :spacing 2
+          (label :class "ws-number" :text "${ws.idx}")
+          (box
+            :class "ws-icons"
+            :orientation "v"
+            :space-evenly false
+            :spacing 1
+            (for win in {ws.windows}
+              (image
+                :class "app-icon"
+                :image-width 16
+                :image-height 16
+                :icon "${win.icon}"))))))))
+
+; ============================================================================
+; System Monitors Widget
+; ============================================================================
+
+(defwidget circular-progress [value label tooltip ?critical]
+  (box
+    :class "circular-monitor"
+    :tooltip tooltip
+    (circular-progress
+      :class "circular ${critical ?: false ? 'critical' : ''}"
+      :value value
+      :thickness 4
+      :clockwise true
+      :start-at 75
+      (label :class "circular-label" :text label))))
+
+(defwidget system-monitors []
+  (box
+    :class "system-monitors"
+    :orientation "v"
+    :space-evenly false
+    :spacing 8
+    (circular-progress
+      :value {system-stats.cpu}
+      :label ""
+      :tooltip "CPU: ${system-stats.cpu}%"
+      :critical {system-stats.cpu > 80})
+    (circular-progress
+      :value {system-stats.mem}
+      :label ""
+      :tooltip "RAM: ${system-stats.mem}%"
+      :critical {system-stats.mem > 80})
+    (circular-progress
+      :value {system-stats.temp}
+      :label ""
+      :tooltip "Temp: ${system-stats.temp}C"
+      :critical {system-stats.temp > 80})))
+
+; ============================================================================
+; Quick Toggles Widget
+; ============================================================================
+
+(defwidget toggle-button [enabled icon onclick tooltip]
+  (button
+    :class "toggle ${enabled ? 'active' : ''}"
+    :onclick onclick
+    :tooltip tooltip
+    (label :text icon)))
+
+(defwidget quick-toggles []
+  (box
+    :class "quick-toggles"
+    :orientation "v"
+    :space-evenly false
+    :spacing 6
+    (toggle-button
+      :enabled {system-stats.wifi_enabled}
+      :icon ""
+      :onclick "~/.local/bin/eww-wifi-toggle"
+      :tooltip "WiFi: ${system-stats.wifi_ssid ?: 'Disconnected'}")
+    (toggle-button
+      :enabled {system-stats.bluetooth}
+      :icon ""
+      :onclick "~/.local/bin/eww-bluetooth-toggle"
+      :tooltip "Bluetooth")
+    (toggle-button
+      :enabled {system-stats.caffeine}
+      :icon ""
+      :onclick "~/.local/bin/eww-caffeine-toggle"
+      :tooltip "Caffeine (prevent sleep)")
+    (toggle-button
+      :enabled {system-stats.nightlight}
+      :icon ""
+      :onclick "~/.local/bin/eww-nightlight-toggle"
+      :tooltip "Night Light")))
+
+; ============================================================================
+; System Info Widget
+; ============================================================================
+
+(defwidget system-info []
+  (box
+    :class "system-info"
+    :orientation "v"
+    :space-evenly false
+    :spacing 8
+    ; Volume
+    (button
+      :class "info-button"
+      :onclick "pavucontrol &"
+      :tooltip "Volume: ${system-stats.volume}%${system-stats.muted ? ' (muted)' : ''}"
+      (label :text {system-stats.muted ? "" :
+                    system-stats.volume < 30 ? "" :
+                    system-stats.volume < 70 ? "" : ""}))
+    ; Battery
+    (box
+      :class "battery ${system-stats.battery < 20 ? 'critical' : ''}"
+      :tooltip "Battery: ${system-stats.battery}% (${system-stats.battery_status})"
+      (label :text {system-stats.battery_status == "Charging" ? "" :
+                    system-stats.battery > 80 ? "" :
+                    system-stats.battery > 60 ? "" :
+                    system-stats.battery > 40 ? "" :
+                    system-stats.battery > 20 ? "" : ""}))
+    ; Disk
+    (box
+      :class "disk ${system-stats.disk > 90 ? 'critical' : ''}"
+      :tooltip "Disk: ${system-stats.disk}% used"
+      (label :text ""))))
+
+; ============================================================================
+; Clock Widget
+; ============================================================================
+
+(defwidget clock []
+  (box
+    :class "clock"
+    :orientation "v"
+    :space-evenly false
+    :spacing 2
+    (label :class "time-hour" :text time-hour)
+    (label :class "time-min" :text time-min)
+    (label :class "date-day" :text date-day)
+    (label :class "date-num" :text date-num)))
+
+; ============================================================================
+; Main Sidebar Widget
+; ============================================================================
+
+(defwidget sidebar-content []
+  (box
+    :class "sidebar-content"
+    :orientation "v"
+    :space-evenly false
+    ; Top section - workspaces
+    (box
+      :class "top-section"
+      :orientation "v"
+      :space-evenly false
+      :vexpand false
+      (workspaces))
+    ; Spacer
+    (box :vexpand true)
+    ; Bottom section - monitors, toggles, info, clock
+    (box
+      :class "bottom-section"
+      :orientation "v"
+      :space-evenly false
+      :spacing 12
+      (system-monitors)
+      (quick-toggles)
+      (system-info)
+      (clock))))
+
+; ============================================================================
+; Window Definition
+; ============================================================================
+
+(defwindow sidebar
+  :monitor 0
+  :geometry (geometry
+    :x "0px"
+    :y "0px"
+    :width "60px"
+    :height "100%"
+    :anchor "left center")
+  :stacking "fg"
+  :exclusive true
+  :focusable false
+  :namespace "eww-sidebar"
+  (sidebar-content))

@@ -16,6 +16,7 @@ in {
     ./firefox.nix
     ./hyprland.nix
     ./niri.nix
+    ./eww.nix
     ./i3.nix
     ./zsh.nix
     ./terminal.nix
