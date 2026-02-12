@@ -28,7 +28,7 @@ $highlight: #33ccff;
 
 * {
   all: unset;
-  font-family: "JetBrainsMono Nerd Font", "Symbols Nerd Font", monospace;
+  font-family: "JetBrainsMono Nerd Font", monospace;
   font-size: 14px;
 }
 
@@ -105,6 +105,8 @@ $highlight: #33ccff;
 }
 
 .circular {
+  min-width: 40px;
+  min-height: 40px;
   background-color: $nord1;
   color: $nord10;
 

@@ -103,6 +103,7 @@ in
             { command = ["wl-paste" "--type" "text" "--watch" "cliphist" "store"]; }
             { command = ["wl-paste" "--type" "image" "--watch" "cliphist" "store"]; }
             { command = ["sh" "-c" "~/.local/bin/niri-display-switcher.sh"]; }  # Initialize display state on login
+            { command = ["sh" "-c" "~/.local/bin/restore-terminal-session"]; }  # Restore terminal windows from previous session
           ];
 
           # Environment variables (set within Niri session)
@@ -397,6 +398,78 @@ in
         SDL_VIDEODRIVER = "wayland";
         XDG_SESSION_TYPE = "wayland";
         WLR_NO_HARDWARE_CURSORS = "1";
+      };
+
+      # Terminal session save script - saves kitty windows state for restoration
+      home.file.".local/bin/save-terminal-session" = {
+        text = ''
+          #!/usr/bin/env bash
+          set -euo pipefail
+
+          STATE_FILE="$HOME/.config/niri/terminal-session.json"
+          mkdir -p "$(dirname "$STATE_FILE")"
+
+          # Get kitty windows from niri (PID, workspace, column position)
+          niri_windows=$(niri msg -j windows | jq -c '[.[] | select(.app_id == "kitty") | {
+            pid: .pid,
+            workspace: .workspace_id,
+            column: .layout.pos_in_scrolling_layout[0]
+          }]')
+
+          # For each kitty window, query its socket for the cwd
+          result="[]"
+          for row in $(echo "$niri_windows" | jq -c '.[]'); do
+            pid=$(echo "$row" | jq -r '.pid')
+            workspace=$(echo "$row" | jq -r '.workspace')
+            column=$(echo "$row" | jq -r '.column')
+            socket="/tmp/kitty-$pid"
+
+            if [[ -S "$socket" ]]; then
+              # Query this kitty instance for its cwd
+              cwd=$(kitten @ --to "unix:$socket" ls 2>/dev/null | jq -r '.[].tabs[].windows[0].cwd // empty' | head -1)
+              if [[ -n "$cwd" ]]; then
+                result=$(echo "$result" | jq --arg ws "$workspace" --arg col "$column" --arg cwd "$cwd" \
+                  '. + [{workspace: ($ws | tonumber), column: ($col | tonumber), cwd: $cwd}]')
+              fi
+            fi
+          done
+
+          # Sort by workspace then column
+          result=$(echo "$result" | jq 'sort_by(.workspace, .column)')
+
+          echo "$result" > "$STATE_FILE"
+          echo "Saved $(echo "$result" | jq length) terminal(s) to $STATE_FILE"
+        '';
+        executable = true;
+      };
+
+      # Terminal session restore script - restores kitty windows on startup
+      home.file.".local/bin/restore-terminal-session" = {
+        text = ''
+          #!/usr/bin/env bash
+          set -euo pipefail
+
+          STATE_FILE="$HOME/.config/niri/terminal-session.json"
+          [[ -f "$STATE_FILE" ]] || exit 0
+
+          current_ws=""
+          while IFS= read -r line; do
+            ws=$(echo "$line" | jq -r '.workspace')
+            cwd=$(echo "$line" | jq -r '.cwd')
+
+            # Focus workspace if changed
+            if [[ "$ws" != "$current_ws" ]]; then
+              niri msg action focus-workspace "$ws"
+              current_ws="$ws"
+              sleep 0.1
+            fi
+
+            # Spawn kitty in the saved directory
+            niri msg action spawn -- kitty --directory "$cwd"
+            sleep 0.2  # Allow window to open before next spawn (maintains order)
+          done < <(jq -c '.[]' "$STATE_FILE")
+        '';
+        executable = true;
       };
 
       # Display switcher script - auto enable/disable laptop screen on hotplug

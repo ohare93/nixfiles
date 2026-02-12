@@ -59,6 +59,7 @@
 
       fonts.packages = with pkgs; [
         nerd-fonts.hasklug
+        nerd-fonts.jetbrains-mono
       ];
 
       programs.neovim.enable = true;

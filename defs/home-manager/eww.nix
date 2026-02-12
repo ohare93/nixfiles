@@ -176,18 +176,19 @@ in
 
                   if event_type == "WorkspacesChanged":
                       workspaces = data.get("workspaces", [])
-                      # Rebuild workspace list, preserving window info
-                      old_windows = {idx: ws.get("windows", []) for idx, ws in self.workspaces.items()}
+                      # Rebuild workspace list, preserving window info keyed by stable id
+                      old_windows_by_id = {ws.get("id"): ws.get("windows", []) for ws in self.workspaces.values()}
                       self.workspaces = {}
                       for ws in workspaces:
                           idx = ws.get("idx", ws.get("id"))
+                          ws_id = ws.get("id")
                           self.workspaces[idx] = {
-                              "id": ws.get("id"),
+                              "id": ws_id,
                               "idx": idx,
                               "is_focused": ws.get("is_focused", False),
                               "is_active": ws.get("is_active", False),
                               "output": ws.get("output", ""),
-                              "windows": old_windows.get(idx, [])
+                              "windows": old_windows_by_id.get(ws_id, [])
                           }
                           if ws.get("is_focused"):
                               self.focused_workspace = idx
@@ -206,6 +207,38 @@ in
                                       other["is_focused"] = False
                                   ws["is_focused"] = True
                                   self.focused_workspace = idx
+                      return True
+
+                  elif event_type == "WindowsChanged":
+                      # Bulk window update (sent on initial connect and config reload)
+                      win_list = data.get("windows", [])
+                      self.windows = {}
+                      # Clear all workspace window lists
+                      for ws in self.workspaces.values():
+                          ws["windows"] = []
+                      # Rebuild from scratch
+                      for win in win_list:
+                          win_id = win.get("id")
+                          ws_id = win.get("workspace_id")
+                          app_id = win.get("app_id", "")
+                          self.windows[win_id] = {
+                              "id": win_id,
+                              "app_id": app_id,
+                              "title": win.get("title", ""),
+                              "workspace_id": ws_id,
+                              "is_focused": win.get("is_focused", False),
+                              "icon": get_icon(app_id)
+                          }
+                          if win.get("is_focused"):
+                              self.focused_window = win_id
+                          for workspace in self.workspaces.values():
+                              if workspace["id"] == ws_id:
+                                  workspace["windows"].append({
+                                      "id": win_id,
+                                      "app_id": app_id,
+                                      "icon": get_icon(app_id)
+                                  })
+                                  break
                       return True
 
                   elif event_type == "WindowOpenedOrChanged":
@@ -344,12 +377,18 @@ in
           # Memory usage (percentage)
           mem=$(free | awk '/^Mem:/ {printf "%.0f", $3/$2*100}')
 
-          # Temperature (from sensors - supports Intel Core and AMD Tctl)
-          temp=$(sensors 2>/dev/null | awk '/^Core 0:|^Tctl:/ {gsub(/[+°C]/,""); print $2; exit}')
-          if [[ -z "$temp" ]]; then
+          # Temperature (from sensors - supports ThinkPad, Intel Core, AMD Tctl)
+          temp=$(sensors 2>/dev/null | awk '
+            /^CPU:/ { gsub(/[+°C]/,""); print $2; exit }
+            /^Core 0:/ { gsub(/[+°C]/,""); print $3; exit }
+            /^Tctl:/ { gsub(/[+°C]/,""); print $2; exit }
+          ')
+          # Strip any decimal (printf needs integer)
+          temp=''${temp%%.*}
+          if [[ -z "$temp" || "$temp" == "0" ]]; then
               # Fallback to thermal zone
-              temp=$(cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null)
-              temp=$((temp / 1000))
+              tz=$(cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null)
+              [[ -n "$tz" ]] && temp=$((tz / 1000))
           fi
           temp=''${temp:-50}
 
