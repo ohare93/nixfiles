@@ -76,6 +76,7 @@ in
           global = {
             # Auto-allow devbox projects in trusted directories
             strict_env = true;
+            hide_env_diff = true;
           };
           direnvrc = mkIf (!config.mynix.agentic-dev.enable) (mkAfter ''
             # Enhanced devbox integration
