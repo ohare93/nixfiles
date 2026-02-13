@@ -418,8 +418,8 @@ in
           # Bluetooth status
           bt_powered=$(bluetoothctl show 2>/dev/null | grep -q "Powered: yes" && echo "true" || echo "false")
 
-          # Night light (hyprsunset service)
-          nightlight=$(systemctl --user is-active hyprsunset.service 2>/dev/null)
+          # Night light (wlsunset service)
+          nightlight=$(systemctl --user is-active wlsunset.service 2>/dev/null)
           nightlight=$([[ "$nightlight" == "active" ]] && echo "true" || echo "false")
 
           # Caffeine (check for systemd-inhibit)
@@ -482,11 +482,11 @@ in
       home.file.".local/bin/eww-nightlight-toggle" = {
         text = ''
           #!/usr/bin/env bash
-          if systemctl --user is-active hyprsunset.service >/dev/null 2>&1; then
-              systemctl --user stop hyprsunset.service
+          if systemctl --user is-active wlsunset.service >/dev/null 2>&1; then
+              systemctl --user stop wlsunset.service
               notify-send "Night Light" "Disabled"
           else
-              systemctl --user start hyprsunset.service
+              systemctl --user start wlsunset.service
               notify-send "Night Light" "Enabled"
           fi
         '';
