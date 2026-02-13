@@ -405,6 +405,7 @@ in
           set -o pipefail
 
           STATE_FILE="''${XDG_STATE_HOME:-$HOME/.local/state}/niri/session.json"
+          RESTORE_BOOT_MARKER="''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/niri-session-restore.boot-id"
           STATE_DIR="$(dirname "$STATE_FILE")"
 
           log() {
@@ -585,6 +586,21 @@ in
 
           [[ -f "$STATE_FILE" ]] || exit 0
           jq -e '.schema_version == 1' "$STATE_FILE" >/dev/null 2>&1 || exit 0
+
+          current_boot_id=$(cat /proc/sys/kernel/random/boot_id 2>/dev/null || true)
+          if [[ -z "$current_boot_id" ]]; then
+            log "unable to read boot id; skipping restore"
+            exit 0
+          fi
+
+          if [[ -f "$RESTORE_BOOT_MARKER" ]]; then
+            last_restore_boot_id=$(cat "$RESTORE_BOOT_MARKER" 2>/dev/null || true)
+            if [[ "$last_restore_boot_id" == "$current_boot_id" ]]; then
+              log "restore already ran for this boot; skipping"
+              exit 0
+            fi
+          fi
+
           wait_for_niri_ipc || exit 0
 
           current_workspaces=$(niri msg --json workspaces 2>/dev/null || printf '[]')
@@ -609,6 +625,8 @@ in
 
           restore_windows "$non_terminal_windows"
           restore_windows "$terminal_windows"
+
+          printf '%s\n' "$current_boot_id" > "$RESTORE_BOOT_MARKER"
         '';
         executable = true;
       };
