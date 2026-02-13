@@ -371,6 +371,16 @@ in
           #!/usr/bin/env bash
           # Output system stats as JSON for eww polling
 
+          sanitize_int() {
+            local value="''${1:-0}"
+            value="''${value%%.*}"
+            value=$(printf '%s' "$value" | tr -cd '0-9-')
+            if [[ -z "$value" || "$value" == "-" ]]; then
+                value=0
+            fi
+            printf '%s' "$value"
+          }
+
           # CPU usage (percentage)
           cpu=$(awk '/^cpu / {usage=($2+$4)*100/($2+$4+$5)} END {printf "%.0f", usage}' /proc/stat)
 
@@ -397,8 +407,8 @@ in
 
           # Volume (percentage, muted status)
           vol_info=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null)
-          vol=$(echo "$vol_info" | awk '{printf "%.0f", $2*100}')
-          muted=$(echo "$vol_info" | grep -q MUTED && echo "true" || echo "false")
+          vol=$(awk '{printf "%.0f", $2*100}' <<<"$vol_info")
+          muted=$([[ "$vol_info" == *MUTED* ]] && echo "true" || echo "false")
 
           # Battery (auto-detect BAT0/BAT1/etc)
           bat_path=$(ls -d /sys/class/power_supply/BAT* 2>/dev/null | head -1)
@@ -418,13 +428,20 @@ in
           # Bluetooth status
           bt_powered=$(bluetoothctl show 2>/dev/null | grep -q "Powered: yes" && echo "true" || echo "false")
 
-          # Night light (hyprsunset service)
-          nightlight=$(systemctl --user is-active hyprsunset.service 2>/dev/null)
+          # Night light (wlsunset service)
+          nightlight=$(systemctl --user is-active wlsunset.service 2>/dev/null)
           nightlight=$([[ "$nightlight" == "active" ]] && echo "true" || echo "false")
 
           # Caffeine (check for systemd-inhibit)
           caffeine_pid_file="''${XDG_RUNTIME_DIR:-/tmp}/eww-caffeine.pid"
           caffeine=$([[ -f "$caffeine_pid_file" ]] && kill -0 $(cat "$caffeine_pid_file") 2>/dev/null && echo "true" || echo "false")
+
+          cpu=$(sanitize_int "$cpu")
+          mem=$(sanitize_int "$mem")
+          temp=$(sanitize_int "$temp")
+          disk=$(sanitize_int "$disk")
+          vol=$(sanitize_int "$vol")
+          bat_cap=$(sanitize_int "$bat_cap")
 
           # Output JSON (no leading whitespace)
           printf '{"cpu":%d,"mem":%d,"temp":%d,"disk":%d,"volume":%d,"muted":%s,"battery":%d,"battery_status":"%s","wifi_enabled":%s,"wifi_ssid":"%s","bluetooth":%s,"nightlight":%s,"caffeine":%s}\n' \
@@ -482,11 +499,11 @@ in
       home.file.".local/bin/eww-nightlight-toggle" = {
         text = ''
           #!/usr/bin/env bash
-          if systemctl --user is-active hyprsunset.service >/dev/null 2>&1; then
-              systemctl --user stop hyprsunset.service
+          if systemctl --user is-active wlsunset.service >/dev/null 2>&1; then
+              systemctl --user stop wlsunset.service
               notify-send "Night Light" "Disabled"
           else
-              systemctl --user start hyprsunset.service
+              systemctl --user start wlsunset.service
               notify-send "Night Light" "Enabled"
           fi
         '';
@@ -497,11 +514,11 @@ in
       systemd.user.services.eww = {
         Unit = {
           Description = "Eww Daemon";
-          PartOf = ["graphical-session.target"];
           After = ["graphical-session.target"];
         };
         Service = {
           Type = "simple";
+          ExecStartPre = "-${pkgs.eww}/bin/eww kill";
           ExecStart = "${pkgs.eww}/bin/eww daemon --no-daemonize";
           Restart = "on-failure";
           RestartSec = "5s";
@@ -517,6 +534,7 @@ in
           Description = "Eww Sidebar";
           After = ["eww.service"];
           Requires = ["eww.service"];
+          PartOf = ["eww.service"];
         };
         Service = {
           Type = "oneshot";
@@ -527,7 +545,7 @@ in
           ExecStop = "${pkgs.eww}/bin/eww close sidebar";
         };
         Install = {
-          WantedBy = ["graphical-session.target"];
+          WantedBy = ["eww.service"];
         };
       };
     };
