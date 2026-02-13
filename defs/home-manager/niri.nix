@@ -103,7 +103,6 @@ in
             { command = ["wl-paste" "--type" "text" "--watch" "cliphist" "store"]; }
             { command = ["wl-paste" "--type" "image" "--watch" "cliphist" "store"]; }
             { command = ["sh" "-c" "~/.local/bin/niri-display-switcher.sh"]; }  # Initialize display state on login
-            { command = ["sh" "-c" "~/.local/bin/restore-terminal-session"]; }  # Restore terminal windows from previous session
           ];
 
           # Environment variables (set within Niri session)
@@ -245,7 +244,7 @@ in
 
             # System controls
             "Mod+Escape".action.spawn = ["swaylock" "-f" "-c" "000000"];
-            "Mod+Shift+Q".action.quit = [];
+            "Mod+Shift+Q".action.spawn = ["sh" "-c" "systemctl --user start niri-session-quit.service"];
             "Mod+Shift+Slash".action.show-hotkey-overlay = [];
             "Mod+Minus".action.show-hotkey-overlay = [];
 
@@ -303,7 +302,7 @@ in
         events = [
           {
             event = "before-sleep";
-            command = "${pkgs.swaylock}/bin/swaylock -f -c 000000";
+            command = "sh -c '${config.home.homeDirectory}/.local/bin/save-terminal-session; ${pkgs.swaylock}/bin/swaylock -f -c 000000'";
           }
         ];
       };
@@ -666,6 +665,63 @@ in
         Service = {
           Type = "oneshot";
           ExecStart = "${config.home.homeDirectory}/.local/bin/niri-display-switcher.sh";
+        };
+      };
+
+      systemd.user.services.niri-session-save = {
+        Unit = {
+          Description = "Save Niri session state";
+          PartOf = ["graphical-session.target"];
+          After = ["graphical-session.target"];
+        };
+        Service = {
+          Type = "oneshot";
+          ExecStart = "${config.home.homeDirectory}/.local/bin/save-terminal-session";
+        };
+        Install = {
+          WantedBy = ["graphical-session.target"];
+        };
+      };
+
+      systemd.user.timers.niri-session-save = {
+        Unit = {
+          Description = "Periodically save Niri session state";
+        };
+        Timer = {
+          OnBootSec = "2m";
+          OnUnitActiveSec = "2m";
+          Unit = "niri-session-save.service";
+          Persistent = true;
+        };
+        Install = {
+          WantedBy = ["timers.target"];
+        };
+      };
+
+      systemd.user.services.niri-session-restore = {
+        Unit = {
+          Description = "Restore Niri session state";
+          PartOf = ["graphical-session.target"];
+          After = ["graphical-session.target" "niri-display-switcher.service"];
+          Wants = ["graphical-session.target" "niri-display-switcher.service"];
+          ConditionPathExists = "%h/.local/state/niri/session.json";
+        };
+        Service = {
+          Type = "oneshot";
+          ExecStart = "${config.home.homeDirectory}/.local/bin/restore-terminal-session";
+        };
+        Install = {
+          WantedBy = ["graphical-session.target"];
+        };
+      };
+
+      systemd.user.services.niri-session-quit = {
+        Unit = {
+          Description = "Save Niri session and quit";
+        };
+        Service = {
+          Type = "oneshot";
+          ExecStart = "sh -c '${config.home.homeDirectory}/.local/bin/save-terminal-session && niri msg action quit'";
         };
       };
     };
