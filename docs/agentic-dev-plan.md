@@ -87,10 +87,13 @@ Global gitignore entries:
 - `.repo-id`
 
 ## JJ Workspace Helper
-`jjw` creates quick jj workspaces and enters them:
-- `jjw <name>` -> `~/Development/worktrees/<name>` with `jj init`
-- `jjw <url> [area]` -> clone into `~/Development/<area>/<repo>` (default area: worktrees)
-- Writes `.envrc` with `use_dev_env` and runs `direnv allow`
+`jjw` (Go tool: `jj-workspace-helper`) manages jj workspaces per repo:
+- `jjw create [name]` -> creates workspace via `jj workspace add` at `~/Development/worktrees/<app>/<name>`
+- `jjw list` -> prints workspace paths for the current repo
+- `jjw select` -> interactive selection (fzf if available), prints selected path
+- `jjw tidy` -> lists defunct literal-empty workspace dirs and lets you select/tidy
+- `jjw cd [name]` -> for shell wrapper usage (prints path; wrapper changes directory)
+- Creates `.envrc` with `use_dev_env` if missing and runs `direnv allow` when available
 
 ## Build Command
 Use `nh os build --no-nom` (preferred) for evaluation/builds.
@@ -99,6 +102,7 @@ Use `nh os build --no-nom` (preferred) for evaluation/builds.
 - `defs/home-manager/agentic-dev.nix`
 - `defs/home-manager/scripts/dev-cache-prune`
 - `modules/aspects/hm-agentic-dev.nix`
+- `~/Development/active/tools/jj-workspace-helper` (new Go repo)
 - Updates to:
   - `defs/home-manager/default.nix`
   - `defs/home-manager/devbox.nix`

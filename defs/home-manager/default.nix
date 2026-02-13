@@ -5,7 +5,7 @@
   ...
 }: let
   # Import custom packages
-  customPackages = import ./packages {inherit pkgs lib;};
+  customPackages = import ./packages {inherit pkgs lib inputs;};
 in {
   imports = [
     ./syncthing.nix
@@ -45,5 +45,6 @@ in {
   # Add custom packages
   config.home.packages = [
     customPackages.agent-deck
+    customPackages.jj-workspace-helper
   ];
 }

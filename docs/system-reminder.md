@@ -103,6 +103,16 @@ Schedule:
 - `.envrc`
 - `.direnv/`
 - `.repo-id`
+- `.jjw/` (optional, user choice)
+
+## JJ Workspace Helper
+- Use a dedicated Go tool `jjw` (`jj-workspace-helper`) instead of ad-hoc shell scripts.
+- Default behavior is repo-scoped workspace management under `~/Development/worktrees/<app>/<workspace>`.
+- Current-repo commands: `create`, `list`, `select`, `tidy`, `cd`.
+- Name assignment can be explicit or auto-picked from configured lists.
+- Global config: `~/.config/jjw/config.yaml`.
+- Local per-repo override: `<repo-root>/.jjw/config.yaml`.
+- Stateful naming cursor: `<repo-root>/.jjw/state.json`.
 
 ## Implementation Steps (High Level)
 1) Create lifecycle directory structure.

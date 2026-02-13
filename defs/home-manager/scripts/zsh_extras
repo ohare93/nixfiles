@@ -60,42 +60,26 @@ juggle() {
 alias j='juggle'
 
 jjw() {
-  local dev_root="${DEV_ROOT:-$HOME/Development}"
-  local input="$1"
-  local area="$2"
-  local target
-  local base
-
-  if [ -z "$input" ]; then
-    echo "usage: jjw <name|url> [area]" >&2
-    return 1
+  if ! whence -p jjw >/dev/null 2>&1; then
+    echo "jjw: binary not found on PATH" >&2
+    return 127
   fi
 
-  if ! command -v jj >/dev/null 2>&1; then
-    echo "jjw: jujutsu (jj) not found" >&2
-    return 1
+  if [ "$#" -eq 0 ]; then
+    command jjw
+    return $?
   fi
 
-  if [[ "$input" == *"://"* || "$input" == *"@"*":"* || "$input" == git@* ]]; then
-    base="${input##*/}"
-    base="${base%.git}"
-    area="${area:-worktrees}"
-    target="$dev_root/$area/$base"
-    jj git clone "$input" "$target" || return 1
-  else
-    area="${area:-worktrees}"
-    target="$dev_root/$area/$input"
-    mkdir -p "$target"
-    (cd "$target" && jj init) || return 1
-  fi
-
-  if [ ! -f "$target/.envrc" ]; then
-    printf '%s\n' 'use_dev_env' > "$target/.envrc"
-  fi
-
-  if command -v direnv >/dev/null 2>&1; then
-    (cd "$target" && direnv allow .) || true
-  fi
-
-  cd "$target" || return 1
+  case "$1" in
+    create|select|cd)
+      local target
+      target="$(command jjw "$@")" || return $?
+      if [ -n "$target" ]; then
+        cd "$target" || return 1
+      fi
+      ;;
+    *)
+      command jjw "$@"
+      ;;
+  esac
 }

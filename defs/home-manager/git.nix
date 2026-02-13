@@ -9,6 +9,7 @@
       ".envrc"
       ".direnv/"
       ".repo-id"
+      ".jjw/"
     ];
   };
 }
