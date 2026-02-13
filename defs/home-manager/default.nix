@@ -5,7 +5,7 @@
   ...
 }: let
   # Import custom packages
-  customPackages = import ./packages {inherit pkgs lib inputs;};
+  customPackages = import ./packages {inherit pkgs lib;};
 in {
   imports = [
     ./syncthing.nix

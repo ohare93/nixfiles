@@ -1,23 +1,25 @@
 {
   lib,
-  buildGoModule,
-  inputs,
+  writeShellApplication,
 }:
-buildGoModule {
-  pname = "jj-workspace-helper";
-  version = "unstable";
+writeShellApplication {
+  name = "jjw";
 
-  src = builtins.path {
-    path = "${inputs.private.paths.development}/active/tools/jj-workspace-helper";
-    name = "jj-workspace-helper-src";
-  };
+  text = ''
+    set -euo pipefail
 
-  vendorHash = "sha256-g+yaVIx4jxpAQ/+WrGKxhVeliYx7nLQe/zsGpxV4Fn4=";
+    jjw_bin="''${JJW_BIN:-$HOME/.local/bin/jjw}"
+    if [ ! -x "$jjw_bin" ]; then
+      echo "jjw wrapper: expected executable at $jjw_bin" >&2
+      echo "Install/update with: devbox run install-local (in ~/Development/active/tools/jj-workspace-helper)" >&2
+      exit 127
+    fi
 
-  doCheck = false;
+    exec "$jjw_bin" "$@"
+  '';
 
   meta = with lib; {
-    description = "Workspace manager for jj workspaces";
+    description = "Shell wrapper for local jj-workspace-helper binary";
     mainProgram = "jjw";
     platforms = platforms.linux ++ platforms.darwin;
   };
