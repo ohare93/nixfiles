@@ -38,7 +38,7 @@ in
             };
 
             # Warp mouse cursor to focused window
-            warp-mouse-to-focus = true;
+            warp-mouse-to-focus.enable = true;
 
             # Optional: focus follows mouse (only windows fully visible)
             # focus-follows-mouse.max-scroll-amount = "0%";
@@ -299,12 +299,9 @@ in
             resumeCommand = "niri msg action power-on-monitors";
           }
         ];
-        events = [
-          {
-            event = "before-sleep";
-            command = "sh -c '${config.home.homeDirectory}/.local/bin/save-terminal-session; ${pkgs.swaylock}/bin/swaylock -f -c 000000'";
-          }
-        ];
+        events = {
+          before-sleep = "sh -c '${config.home.homeDirectory}/.local/bin/save-terminal-session; ${pkgs.swaylock}/bin/swaylock -f -c 000000'";
+        };
       };
 
       # Install required packages for Niri ecosystem
