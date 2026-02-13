@@ -77,11 +77,11 @@ in
             # Auto-allow devbox projects in trusted directories
             strict_env = true;
           };
-          direnvrc = ''
+          direnvrc = mkIf (!config.mynix.agentic-dev.enable) (mkAfter ''
             # Enhanced devbox integration
             use_devbox() {
               if [[ -f devbox.json ]]; then
-                echo "🚀 Loading devbox environment..."
+                echo "Loading devbox environment..."
                 eval "$(devbox print-env)"
                 export DEVBOX_SHELL_ENABLED=1
               fi
@@ -93,7 +93,7 @@ in
                 use_devbox
               fi
             }
-          '';
+          '');
         };
       };
     };

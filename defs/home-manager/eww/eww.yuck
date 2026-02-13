@@ -58,12 +58,12 @@
 ; System Monitors Widget
 ; ============================================================================
 
-(defwidget circular-meter [value label tooltip ?critical]
+(defwidget circular-meter [value label tooltip ?critical ?color-class]
   (box
     :class "circular-monitor"
     :tooltip tooltip
     (circular-progress
-      :class "circular ${critical ?: false ? 'critical' : ''}"
+      :class "circular ${color-class ?: ''} ${critical ?: false ? 'critical' : ''}"
       :value value
       :thickness 4
       :clockwise true
@@ -78,28 +78,32 @@
     :spacing 8
     (circular-meter
       :value {system-stats.cpu}
-      :label ""
+      :label ""
       :tooltip "CPU: ${system-stats.cpu}%"
-      :critical {system-stats.cpu > 80})
+      :critical {system-stats.cpu > 80}
+      :color-class "cpu")
     (circular-meter
       :value {system-stats.mem}
-      :label ""
+      :label "󰍛"
       :tooltip "RAM: ${system-stats.mem}%"
-      :critical {system-stats.mem > 80})
+      :critical {system-stats.mem > 80}
+      :color-class "mem")
     (circular-meter
       :value {system-stats.temp}
-      :label ""
+      :label ""
       :tooltip "Temp: ${system-stats.temp}C"
-      :critical {system-stats.temp > 80})))
+      :critical {system-stats.temp > 80}
+      :color-class "temp")))
 
 ; ============================================================================
 ; Quick Toggles Widget
 ; ============================================================================
 
-(defwidget toggle-button [enabled icon onclick tooltip]
+(defwidget toggle-button [enabled icon onclick tooltip ?onrightclick]
   (button
     :class "toggle ${enabled ? 'active' : ''}"
     :onclick onclick
+    :onrightclick {onrightclick ?: ""}
     :tooltip tooltip
     (label :text icon)))
 
@@ -111,22 +115,24 @@
     :spacing 6
     (toggle-button
       :enabled {system-stats.wifi_enabled}
-      :icon ""
+      :icon ""
       :onclick "~/.local/bin/eww-wifi-toggle"
+      :onrightclick "nm-connection-editor &"
       :tooltip "WiFi: ${system-stats.wifi_ssid ?: 'Disconnected'}")
     (toggle-button
       :enabled {system-stats.bluetooth}
-      :icon ""
+      :icon ""
       :onclick "~/.local/bin/eww-bluetooth-toggle"
+      :onrightclick "blueman-manager &"
       :tooltip "Bluetooth")
     (toggle-button
       :enabled {system-stats.caffeine}
-      :icon ""
+      :icon ""
       :onclick "~/.local/bin/eww-caffeine-toggle"
       :tooltip "Caffeine (prevent sleep)")
     (toggle-button
       :enabled {system-stats.nightlight}
-      :icon ""
+      :icon ""
       :onclick "~/.local/bin/eww-nightlight-toggle"
       :tooltip "Night Light")))
 
@@ -144,24 +150,31 @@
     (button
       :class "info-button"
       :onclick "pavucontrol &"
+      :onrightclick "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
       :tooltip "Volume: ${system-stats.volume}%${system-stats.muted ? ' (muted)' : ''}"
-      (label :text {system-stats.muted ? "" :
-                    system-stats.volume < 30 ? "" :
-                    system-stats.volume < 70 ? "" : ""}))
+      (box :orientation "v" :space-evenly false
+        (label :text {system-stats.muted ? "" :
+                      system-stats.volume < 30 ? "" :
+                      system-stats.volume < 70 ? "" : ""})
+        (label :class "info-value" :text "${system-stats.volume}%")))
     ; Battery
     (box
       :class "battery ${system-stats.battery < 20 ? 'critical' : ''}"
       :tooltip "Battery: ${system-stats.battery}% (${system-stats.battery_status})"
-      (label :text {system-stats.battery_status == "Charging" ? "" :
-                    system-stats.battery > 80 ? "" :
-                    system-stats.battery > 60 ? "" :
-                    system-stats.battery > 40 ? "" :
-                    system-stats.battery > 20 ? "" : ""}))
+      (box :orientation "v" :space-evenly false
+        (label :text {system-stats.battery_status == "Charging" ? "" :
+                      system-stats.battery > 80 ? "" :
+                      system-stats.battery > 60 ? "" :
+                      system-stats.battery > 40 ? "" :
+                      system-stats.battery > 20 ? "" : ""})
+        (label :class "info-value" :text "${system-stats.battery}%")))
     ; Disk
     (box
       :class "disk ${system-stats.disk > 90 ? 'critical' : ''}"
       :tooltip "Disk: ${system-stats.disk}% used"
-      (label :text ""))))
+      (box :orientation "v" :space-evenly false
+        (label :text "")
+        (label :class "info-value" :text "${system-stats.disk}%")))))
 
 ; ============================================================================
 ; Clock Widget
