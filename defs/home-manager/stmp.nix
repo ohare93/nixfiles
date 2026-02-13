@@ -6,7 +6,7 @@
   ...
 }: let
   cfg = config.mynix.stmp;
-  customPackages = import ./packages {inherit pkgs lib;};
+  customPackages = import ./packages {inherit pkgs lib inputs;};
 in
   with lib; {
     options.mynix = {

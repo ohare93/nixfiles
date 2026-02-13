@@ -2,12 +2,13 @@
   lib,
   config,
   pkgs,
+  inputs,
   hostname,
   ...
 }: let
   cfg = config.mynix.zsh;
   sharedAliases = import ./shared-aliases.nix {inherit lib hostname;};
-  customPackages = import ./packages {inherit pkgs lib;};
+  customPackages = import ./packages {inherit pkgs lib inputs;};
 in
   with lib; {
     options.mynix = {
