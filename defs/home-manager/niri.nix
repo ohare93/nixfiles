@@ -315,6 +315,7 @@ in
         fuzzel
         grim
         slurp
+        jq
         wl-clipboard
         cliphist
         brightnessctl
@@ -400,74 +401,207 @@ in
         WLR_NO_HARDWARE_CURSORS = "1";
       };
 
-      # Terminal session save script - saves kitty windows state for restoration
+      # Session save script - stores app placement + terminal cwd state
       home.file.".local/bin/save-terminal-session" = {
         text = ''
           #!/usr/bin/env bash
-          set -euo pipefail
+          set -u
+          set -o pipefail
 
-          STATE_FILE="$HOME/.config/niri/terminal-session.json"
-          mkdir -p "$(dirname "$STATE_FILE")"
+          STATE_FILE="''${XDG_STATE_HOME:-$HOME/.local/state}/niri/session.json"
+          STATE_DIR="$(dirname "$STATE_FILE")"
 
-          # Get kitty windows from niri (PID, workspace, column position)
-          niri_windows=$(niri msg -j windows | jq -c '[.[] | select(.app_id == "kitty") | {
-            pid: .pid,
-            workspace: .workspace_id,
-            column: .layout.pos_in_scrolling_layout[0]
-          }]')
+          log() {
+            printf '[save-terminal-session] %s\n' "$*" >&2
+          }
 
-          # For each kitty window, query its socket for the cwd
-          result="[]"
-          for row in $(echo "$niri_windows" | jq -c '.[]'); do
-            pid=$(echo "$row" | jq -r '.pid')
-            workspace=$(echo "$row" | jq -r '.workspace')
-            column=$(echo "$row" | jq -r '.column')
-            socket="/tmp/kitty-$pid"
-
-            if [[ -S "$socket" ]]; then
-              # Query this kitty instance for its cwd
-              cwd=$(kitten @ --to "unix:$socket" ls 2>/dev/null | jq -r '.[].tabs[].windows[0].cwd // empty' | head -1)
-              if [[ -n "$cwd" ]]; then
-                result=$(echo "$result" | jq --arg ws "$workspace" --arg col "$column" --arg cwd "$cwd" \
-                  '. + [{workspace: ($ws | tonumber), column: ($col | tonumber), cwd: $cwd}]')
-              fi
+          fetch_json() {
+            local what="$1"
+            local out
+            out=$(niri msg --json "$what" 2>/dev/null || true)
+            if jq -e . >/dev/null 2>&1 <<<"$out"; then
+              printf '%s\n' "$out"
+            else
+              printf '[]\n'
             fi
-          done
+          }
 
-          # Sort by workspace then column
-          result=$(echo "$result" | jq 'sort_by(.workspace, .column)')
+          get_cwd_from_pid() {
+            local pid="$1"
+            if [[ -n "$pid" && "$pid" =~ ^[0-9]+$ ]]; then
+              readlink -f "/proc/$pid/cwd" 2>/dev/null || true
+            fi
+          }
 
-          echo "$result" > "$STATE_FILE"
-          echo "Saved $(echo "$result" | jq length) terminal(s) to $STATE_FILE"
+          mkdir -p "$STATE_DIR" || {
+            log "failed to create state directory"
+            exit 1
+          }
+
+          windows_json=$(fetch_json windows)
+          workspaces_json=$(fetch_json workspaces)
+
+          base_json=$(jq -n \
+            --argjson windows "$windows_json" \
+            --argjson workspaces "$workspaces_json" '
+            def to_num:
+              if type == "number" then .
+              elif type == "string" and test("^-?[0-9]+$") then tonumber
+              else 0 end;
+
+            def workspace_idx_for($ws_id):
+              ([($workspaces // [])[] | select((.id // null) == $ws_id) | (.idx // 0)] | .[0]) // 0;
+
+            {
+              schema_version: 1,
+              saved_at: (now | todateiso8601),
+              windows: [
+                ($windows // [])[] | {
+                  app_id: (.app_id // ""),
+                  title: (.title // ""),
+                  workspace_id: (.workspace_id // null),
+                  workspace_idx: workspace_idx_for(.workspace_id),
+                  column_idx: ((.layout.pos_in_scrolling_layout[0] // 0) | to_num),
+                  is_focused: (.is_focused // false),
+                  is_floating: (.is_floating // false),
+                  pid: (.pid // null)
+                }
+              ]
+            }
+          ')
+
+          windows_with_terminal_state="[]"
+          while IFS= read -r row; do
+            pid=$(jq -r '.pid // ""' <<<"$row")
+            app_id=$(jq -r '.app_id // ""' <<<"$row")
+            if [[ "$app_id" == "kitty" ]]; then
+              cwd=$(get_cwd_from_pid "$pid")
+              windows_with_terminal_state=$(jq \
+                --argjson row "$row" \
+                --arg cwd "$cwd" \
+                '. + [($row + {terminal_state: {emulator: "kitty", cwd: $cwd}})]' \
+                <<<"$windows_with_terminal_state")
+            else
+              windows_with_terminal_state=$(jq --argjson row "$row" '. + [$row]' <<<"$windows_with_terminal_state")
+            fi
+          done < <(jq -c '.windows[]?' <<<"$base_json")
+
+          session_json=$(jq --argjson windows "$windows_with_terminal_state" '.windows = $windows' <<<"$base_json")
+
+          tmp_file=$(mktemp "$STATE_FILE.tmp.XXXXXX")
+          printf '%s\n' "$session_json" > "$tmp_file" && mv "$tmp_file" "$STATE_FILE"
+          log "saved $(jq -r '.windows | length' <<<"$session_json") windows to $STATE_FILE"
         '';
         executable = true;
       };
 
-      # Terminal session restore script - restores kitty windows on startup
+      # Session restore script - restores app placement + terminal cwd
       home.file.".local/bin/restore-terminal-session" = {
         text = ''
           #!/usr/bin/env bash
-          set -euo pipefail
+          set -u
+          set -o pipefail
 
-          STATE_FILE="$HOME/.config/niri/terminal-session.json"
+          STATE_FILE="''${XDG_STATE_HOME:-$HOME/.local/state}/niri/session.json"
+
+          log() {
+            printf '[restore-terminal-session] %s\n' "$*" >&2
+          }
+
+          wait_for_niri_ipc() {
+            local attempts=80
+            local delay=0.15
+            local i out
+
+            for ((i=1; i<=attempts; i++)); do
+              out=$(niri msg --json workspaces 2>/dev/null || true)
+              if jq -e . >/dev/null 2>&1 <<<"$out"; then
+                return 0
+              fi
+              sleep "$delay"
+            done
+
+            return 1
+          }
+
+          command_for_app_id() {
+            local app_id="$1"
+            local lower="''${app_id,,}"
+
+            case "$lower" in
+              firefox*) echo "firefox" ;;
+              org.wezfurlong.wezterm|wezterm*) echo "wezterm" ;;
+              code-oss|com.visualstudio.code.oss|vscode|code) echo "code-oss" ;;
+              slack*) echo "slack" ;;
+              signal*|org.signal.signal*) echo "signal-desktop" ;;
+              spotify*) echo "spotify" ;;
+              obsidian*) echo "obsidian" ;;
+              thunar*) echo "thunar" ;;
+              pavucontrol*) echo "pavucontrol" ;;
+              blueman-manager*|org.blueman.manager*) echo "blueman-manager" ;;
+              *discord*|com.discordapp.discord*) echo "discord" ;;
+              *) echo "$app_id" ;;
+            esac
+          }
+
+          focus_workspace() {
+            local idx="$1"
+            [[ -n "$idx" ]] || return 1
+            niri msg action focus-workspace "$idx" >/dev/null 2>&1
+          }
+
+          spawn_command() {
+            local cmd="$1"
+            niri msg action spawn -- sh -lc "$cmd" >/dev/null 2>&1 || true
+          }
+
           [[ -f "$STATE_FILE" ]] || exit 0
+          jq -e '.schema_version == 1' "$STATE_FILE" >/dev/null 2>&1 || exit 0
+          wait_for_niri_ipc || exit 0
 
-          current_ws=""
-          while IFS= read -r line; do
-            ws=$(echo "$line" | jq -r '.workspace')
-            cwd=$(echo "$line" | jq -r '.cwd')
+          current_workspaces=$(niri msg --json workspaces 2>/dev/null || printf '[]')
 
-            # Focus workspace if changed
-            if [[ "$ws" != "$current_ws" ]]; then
-              niri msg action focus-workspace "$ws"
-              current_ws="$ws"
-              sleep 0.1
+          ordered_windows=$(jq -c --argjson current "$current_workspaces" '
+            def workspace_idx_from_id($ws_id):
+              ([($current // [])[] | select((.id // null) == $ws_id) | (.idx // 0)] | .[0]);
+
+            [(.windows // [])[]
+              | . + {
+                resolved_workspace_idx: (
+                  workspace_idx_from_id(.workspace_id) // (.workspace_idx // 1)
+                )
+              }
+            ]
+            | sort_by(.resolved_workspace_idx, .column_idx)
+            | .[]
+          ' "$STATE_FILE")
+
+          last_ws=""
+          while IFS= read -r win; do
+            [[ -n "$win" ]] || continue
+            ws_idx=$(jq -r '.resolved_workspace_idx // 1' <<<"$win")
+            app_id=$(jq -r '.app_id // ""' <<<"$win")
+
+            if [[ "$ws_idx" != "$last_ws" ]]; then
+              focus_workspace "$ws_idx" || log "failed to focus workspace $ws_idx"
+              last_ws="$ws_idx"
+              sleep 0.05
             fi
 
-            # Spawn kitty in the saved directory
-            niri msg action spawn -- kitty --directory "$cwd"
-            sleep 0.2  # Allow window to open before next spawn (maintains order)
-          done < <(jq -c '.[]' "$STATE_FILE")
+            if [[ "$app_id" == "kitty" ]]; then
+              cwd=$(jq -r '.terminal_state.cwd // ""' <<<"$win")
+              if [[ -n "$cwd" ]]; then
+                printf -v qcwd '%q' "$cwd"
+                spawn_command "kitty --directory $qcwd"
+              else
+                spawn_command "kitty"
+              fi
+            else
+              cmd=$(command_for_app_id "$app_id")
+              [[ -n "$cmd" ]] && spawn_command "$cmd"
+            fi
+            sleep 0.05
+          done <<<"$ordered_windows"
         '';
         executable = true;
       };
