@@ -58,3 +58,28 @@ juggle() {
 }
 
 alias j='juggle'
+
+jjw() {
+  if ! whence -p jjw >/dev/null 2>&1; then
+    echo "jjw: binary not found on PATH" >&2
+    return 127
+  fi
+
+  if [ "$#" -eq 0 ]; then
+    command jjw
+    return $?
+  fi
+
+  case "$1" in
+    create|select|cd|main)
+      local target
+      target="$(command jjw "$@")" || return $?
+      if [ -n "$target" ]; then
+        cd "$target" || return 1
+      fi
+      ;;
+    *)
+      command jjw "$@"
+      ;;
+  esac
+}

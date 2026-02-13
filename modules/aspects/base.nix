@@ -17,11 +17,7 @@
       networking.hostName = hostname;
       networking.networkmanager.enable = true;
 
-      # Configure nh with flake location
-      programs.nh = {
-        enable = true;
-        flake = "/home/jmo/nixfiles";
-      };
+      programs.nh.enable = true;
 
       environment.systemPackages = with pkgs; [
         # Basic utilities

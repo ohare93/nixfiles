@@ -172,10 +172,7 @@
           networking.hostName = hostname;
           networking.networkmanager.enable = true;
 
-          programs.nh = {
-            enable = true;
-            flake = "/home/jmo/nixfiles";
-          };
+          programs.nh.enable = true;
 
           environment.systemPackages = with inputs.nixpkgs.legacyPackages.aarch64-linux; [
             wget
