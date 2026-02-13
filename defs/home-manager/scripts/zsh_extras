@@ -71,7 +71,7 @@ jjw() {
   fi
 
   case "$1" in
-    create|select|cd)
+    create|select|cd|main)
       local target
       target="$(command jjw "$@")" || return $?
       if [ -n "$target" ]; then
