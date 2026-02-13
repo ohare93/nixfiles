@@ -529,8 +529,10 @@ in
 
             case "$lower" in
               firefox*) echo "firefox" ;;
+              zen*) echo "zen" ;;
               org.wezfurlong.wezterm|wezterm*) echo "wezterm" ;;
               code-oss|com.visualstudio.code.oss|vscode|code) echo "code-oss" ;;
+              com.mitchellh.ghostty|ghostty*) echo "ghostty" ;;
               slack*) echo "slack" ;;
               signal*|org.signal.signal*) echo "signal-desktop" ;;
               spotify*) echo "spotify" ;;
@@ -554,6 +556,36 @@ in
             niri msg action spawn -- sh -lc "$cmd" >/dev/null 2>&1 || true
           }
 
+          restore_windows() {
+            local list_json="$1"
+            local last_ws=""
+            while IFS= read -r win; do
+              [[ -n "$win" ]] || continue
+              ws_idx=$(jq -r '.resolved_workspace_idx // 1' <<<"$win")
+              app_id=$(jq -r '.app_id // ""' <<<"$win")
+
+              if [[ "$ws_idx" != "$last_ws" ]]; then
+                focus_workspace "$ws_idx" || log "failed to focus workspace $ws_idx"
+                last_ws="$ws_idx"
+                sleep 0.05
+              fi
+
+              if [[ "$app_id" == "kitty" ]]; then
+                cwd=$(jq -r '.terminal_state.cwd // ""' <<<"$win")
+                if [[ -n "$cwd" ]]; then
+                  printf -v qcwd '%q' "$cwd"
+                  spawn_command "kitty --directory $qcwd"
+                else
+                  spawn_command "kitty"
+                fi
+              else
+                cmd=$(command_for_app_id "$app_id")
+                [[ -n "$cmd" ]] && spawn_command "$cmd"
+              fi
+              sleep 0.05
+            done <<<"$list_json"
+          }
+
           [[ -f "$STATE_FILE" ]] || exit 0
           jq -e '.schema_version == 1' "$STATE_FILE" >/dev/null 2>&1 || exit 0
           wait_for_niri_ipc || exit 0
@@ -575,32 +607,11 @@ in
             | .[]
           ' "$STATE_FILE")
 
-          last_ws=""
-          while IFS= read -r win; do
-            [[ -n "$win" ]] || continue
-            ws_idx=$(jq -r '.resolved_workspace_idx // 1' <<<"$win")
-            app_id=$(jq -r '.app_id // ""' <<<"$win")
+          non_terminal_windows=$(jq -c 'select((.app_id // "") != "kitty")' <<<"$ordered_windows")
+          terminal_windows=$(jq -c 'select((.app_id // "") == "kitty")' <<<"$ordered_windows")
 
-            if [[ "$ws_idx" != "$last_ws" ]]; then
-              focus_workspace "$ws_idx" || log "failed to focus workspace $ws_idx"
-              last_ws="$ws_idx"
-              sleep 0.05
-            fi
-
-            if [[ "$app_id" == "kitty" ]]; then
-              cwd=$(jq -r '.terminal_state.cwd // ""' <<<"$win")
-              if [[ -n "$cwd" ]]; then
-                printf -v qcwd '%q' "$cwd"
-                spawn_command "kitty --directory $qcwd"
-              else
-                spawn_command "kitty"
-              fi
-            else
-              cmd=$(command_for_app_id "$app_id")
-              [[ -n "$cmd" ]] && spawn_command "$cmd"
-            fi
-            sleep 0.05
-          done <<<"$ordered_windows"
+          restore_windows "$non_terminal_windows"
+          restore_windows "$terminal_windows"
         '';
         executable = true;
       };
@@ -617,12 +628,11 @@ in
           # Small delay to let niri detect the display change
           sleep 1
 
-          # Count connected outputs (excluding the laptop screen itself when checking)
-          # niri msg outputs returns JSON-like output with "Output" entries
-          external_monitors=$(niri msg outputs 2>/dev/null | grep -c "Output" || echo 0)
+          # Count outputs using stable JSON output
+          output_count=$(niri msg --json outputs 2>/dev/null | jq 'length' 2>/dev/null || echo 0)
 
           # If we have more than 1 output total (laptop + external), external is connected
-          if [[ $external_monitors -gt 1 ]]; then
+          if [[ $output_count -gt 1 ]]; then
             # External monitor detected: disable laptop screen
             niri msg output "$BUILTIN_DISPLAY" off 2>/dev/null
             notify-send "Display Hotplug" "Laptop screen disabled - using external monitor"
@@ -643,8 +653,8 @@ in
 
           BUILTIN_DISPLAY="eDP-1"
 
-          # Check if eDP-1 is currently off by looking at niri msg outputs
-          if niri msg outputs 2>/dev/null | grep -A10 "$BUILTIN_DISPLAY" | grep -q "current mode: none"; then
+          # Check if eDP-1 is currently off using stable JSON output
+          if niri msg --json outputs 2>/dev/null | jq -e --arg output "$BUILTIN_DISPLAY" '.[] | select(.name == $output and ((.current_mode // null) == null))' >/dev/null 2>&1; then
             # Laptop is disabled, enable it
             niri msg output "$BUILTIN_DISPLAY" on 2>/dev/null
             notify-send "Laptop Screen" "Enabled"
