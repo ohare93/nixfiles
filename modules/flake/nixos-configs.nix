@@ -172,7 +172,10 @@
           networking.hostName = hostname;
           networking.networkmanager.enable = true;
 
-          programs.nh.enable = true;
+          programs.nh = {
+            enable = true;
+            clean.extraArgs = "--keep 5 --keep-since 14d --no-gcroots";
+          };
 
           environment.systemPackages = with inputs.nixpkgs.legacyPackages.aarch64-linux; [
             wget
