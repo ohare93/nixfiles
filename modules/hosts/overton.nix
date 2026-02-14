@@ -56,12 +56,6 @@
       # Open port for ttyd (web terminal for zellij access from phone)
       networking.firewall.allowedTCPPorts = [7681];
 
-      # udev rule for automatic monitor hotplug detection
-      # Triggers hypr-display-switcher service when monitors are plugged/unplugged
-      services.udev.extraRules = ''
-        ACTION=="change", SUBSYSTEM=="drm", TAG+="systemd", ENV{SYSTEMD_USER_WANTS}="hypr-display-switcher.service"
-      '';
-
       environment.systemPackages = with pkgs; [
         pcsclite
       ];

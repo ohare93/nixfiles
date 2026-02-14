@@ -39,6 +39,7 @@ in {
     ./typst.nix
     ./self-employed.nix
     ./hyprsunset.nix
+    ./wlsunset.nix
     inputs.immich-auto-uploader.nixosModules.home-manager
   ];
 

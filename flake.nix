@@ -77,7 +77,8 @@
     };
 
     niri = {
-      url = "github:sodiboo/niri-flake";
+      # TODO: Put back to the original flake after my PR is pulled
+      url = "github:ohare93/niri-flake/layout-per-display";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

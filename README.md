@@ -424,6 +424,70 @@ lspci | grep -i vga
 echo $XDG_SESSION_TYPE
 ```
 
+### Niri Per-Display Layout Profiles (Overton)
+
+This setup keeps the current ultrawide behavior as the global default, and only
+overrides layout width presets on the laptop panel.
+
+```nix
+# defs/home-manager/niri.nix
+programs.niri.settings = {
+  outputs = {
+    # Ultrawide keeps global layout defaults
+    "DVI-I-1" = {
+      mode = {
+        width = 5120;
+        height = 1440;
+        refresh = 59.977;
+      };
+      scale = 1.25;
+    };
+
+    # Laptop uses wider default + wider preset cycle
+    "eDP-1" = {
+      mode = {
+        width = 1920;
+        height = 1080;
+        refresh = 60.0;
+      };
+      scale = 1.25;
+      layout = {
+        default-column-width = { proportion = 2.0 / 3.0; };
+        preset-column-widths = [
+          { proportion = 1.0 / 2.0; }
+          { proportion = 2.0 / 3.0; }
+          { proportion = 3.0 / 4.0; }
+          { proportion = 5.0 / 6.0; }
+        ];
+      };
+    };
+  };
+
+  # Global defaults (used by ultrawide and as fallback)
+  layout = {
+    preset-column-widths = [
+      { proportion = 1.0 / 3.0; }
+      { proportion = 1.0 / 2.0; }
+      { proportion = 2.0 / 3.0; }
+    ];
+    default-column-width = { proportion = 1.0 / 2.0; };
+  };
+};
+```
+
+This depends on the `niri-flake` branch with per-output `layout` support:
+
+```nix
+# flake.nix
+inputs.niri.url = "github:ohare93/niri-flake/layout-per-display";
+```
+
+Useful runtime check:
+
+```bash
+niri msg outputs
+```
+
 ## Disk Usage
 
 ```bash
