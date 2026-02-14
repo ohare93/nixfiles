@@ -13,10 +13,16 @@
       "nix-env",
       "nix-channel",
       "nix-collect-garbage",
-      "nixos-rebuild",
       "nh"
     ],
     "network": {
+      "allowedDomains": [
+        "cache.nixos.org",
+        "channels.nixos.org",
+        "releases.nixos.org",
+        "nix-community.cachix.org",
+        "cachix.cachix.org"
+      ],
       "allowUnixSockets": ["/run/user/1000/gnupg/S.gpg-agent.ssh"]
     }
   },
@@ -29,8 +35,6 @@
       "Bash(nix-store:*)",
       "Bash(nix-build:*)",
       "Bash(nh:*)",
-      "Bash(nixos-rebuild test:*)",
-      "Bash(sudo nixos-rebuild test:*)",
       "Bash(home-manager build:*)",
       "Bash(home-manager generations:*)",
       "Bash(alejandra:*)",
@@ -104,9 +108,7 @@
     "deny": [
       "Bash(jj git push:*)",
       "Bash(nh os switch:*)",
-      "Bash(nh os switch)",
-      "Bash(nixos-rebuild switch:*)",
-      "Bash(sudo nixos-rebuild switch:*)"
+      "Bash(nh os switch)"
     ]
   }
 }
