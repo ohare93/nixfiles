@@ -112,6 +112,7 @@
         self.modules.homeManager.hm-bitwarden
         self.modules.homeManager.hm-typst
         self.modules.homeManager.hm-self-employed
+        self.modules.homeManager.hm-karakeep
       ];
 
       programs.zellij.enableZshIntegration = lib.mkForce false;

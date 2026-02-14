@@ -36,6 +36,8 @@ in {
     ./neomutt.nix
     ./stmp.nix
     ./bitwarden.nix
+    ./karakeep.nix
+    ./host-env.nix
     ./typst.nix
     ./self-employed.nix
     ./hyprsunset.nix
